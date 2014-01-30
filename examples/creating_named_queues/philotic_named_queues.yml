@@ -1,0 +1,6 @@
+# consume ansible + subspace + new_message events
+ansible.new_messages:
+  - philotic_product: ansible
+    philotic_component: subspace
+    philotic_event_type: new_message
+    x-match: all

@@ -1,0 +1,19 @@
+available_or_male:
+  gender: Male
+  available: true
+  x-match: any
+  
+available_male:
+  gender: Male
+  available: true
+  x-match: all
+  
+available_or_female:
+  gender: Female
+  available: true
+  x-match: any
+  
+available_female:
+  gender: Female
+  available: true
+  x-match: all
