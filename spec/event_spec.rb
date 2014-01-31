@@ -19,7 +19,7 @@ describe Philotic::Event do
     specify { subject.methods.should include "#{method_name}=".to_sym }
   end
   
-  Philotic::EVENTBUS_HEADERS.each do |method_name|
+  Philotic::PHILOTIC_HEADERS.each do |method_name|
     specify { subject.methods.should include method_name.to_sym }
     specify { subject.methods.should include "#{method_name}=".to_sym }
   end

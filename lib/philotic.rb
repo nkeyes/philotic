@@ -3,11 +3,8 @@ require 'active_support/all'
 
 require 'pathname'
 
-require 'log4r'
-require 'log4r/yamlconfigurator'
-require 'log4r/outputter/datefileoutputter'
-require 'log4r/outputter/syslogoutputter'
-include Log4r
+require 'logger'
+
 
 module Philotic
   mattr_accessor :logger
@@ -41,7 +38,7 @@ module Philotic
       :expiration,
   ]
 
-  EVENTBUS_HEADERS = [
+  PHILOTIC_HEADERS = [
       :philotic_firehose,
       :philotic_product,
       :philotic_component,
@@ -71,22 +68,31 @@ module Philotic
     Philotic::Connection.exchange
   end
 
-  def self.initialize_named_queue!(queue_name, arguments_list, &block)
+  def self.initialize_named_queue!(queue_name, config, &block)
+    config = config.deep_symbolize_keys
+
+
     raise "ENV['INITIALIZE_NAMED_QUEUE'] must equal 'true' to run Philotic.initialize_named_queue!" unless ENV['INITIALIZE_NAMED_QUEUE'] == 'true'
     connect! do
-      queue_options = Philotic::DEFAULT_NAMED_QUEUE_OPTIONS
-      arguments_list = [arguments_list] if !arguments_list.is_a? Array
+      queue_options = DEFAULT_NAMED_QUEUE_OPTIONS.dup
+      queue_options.merge!(config[:options] || {})
+
       AMQP.channel.queue(queue_name, queue_options) do |old_queue|
         old_queue.delete do
           Philotic::Connection.close do
             connect! do
               Philotic.logger.info "deleted old queue. queue:#{queue_name}"
+
+              bindings = Array(config[:bindings])
+
+              queue_exchange = config[:exchange] ? AMQP.channel.headers(config[:exchange], durable: true) : exchange
+
               AMQP.channel.queue(queue_name, queue_options) do |q|
                 Philotic.logger.info "Created queue. queue:#{q.name}"
-                arguments_list.each_with_index do |arguments, arguments_index|
-                  q.bind(exchange, {arguments: arguments}) do
+                bindings.each_with_index do |arguments, arguments_index|
+                  q.bind(queue_exchange, { arguments: arguments }) do
                     Philotic.logger.info "Added binding to queue. queue:#{q.name} binding:#{arguments}"
-                    if arguments_index >= arguments_list.size - 1
+                    if arguments_index >= bindings.size - 1
                       Philotic.logger.info "Finished adding bindings to queue. queue:#{q.name}"
                       block.call(q) if block
                     end
@@ -105,7 +111,7 @@ module Philotic
   end
 
   def self.init_logger
-    Logger.new("/dev/null")
+    Logger.new(STDOUT)
   end
 
   def self.on_publish_event(&block)

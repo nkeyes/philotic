@@ -7,6 +7,8 @@ module Philotic
   class Config
     include Singleton
 
+    ENV_PREFIX = 'PHILOTIC'
+
     DEFAULT_DISABLE_PUBLISH = false
 
 
@@ -44,12 +46,16 @@ module Philotic
     end
 
     def defaults
-      @defaults ||= Hash[ Config.constants.collect { |c| [ c.slice(8..-1).downcase.to_sym, Config.const_get(c) ] } ]
+      @defaults ||= Hash[Config.constants.select { |c| c.to_s.start_with? 'DEFAULT_' }.collect do |c|
+        key = c.slice(8..-1).downcase.to_sym
+        [key, ENV["#{ENV_PREFIX}_#{key}"] || Config.const_get(c)]
+      end
+      ]
     end
 
     def load(config)
-      Philotic.logger     # ensure the logger can be created, so we crash early if it can't
-      
+      Philotic.logger # ensure the logger can be created, so we crash early if it can't
+
       config.each do |k, v|
         mutator = "#{k}="
         send(mutator, v) if respond_to? mutator
