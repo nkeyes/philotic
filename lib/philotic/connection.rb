@@ -12,8 +12,8 @@ module Philotic
 
     def initialize
       @config = Philotic::Config
-      @config.rabbit_host = ENV['EVENTBUS_RABBIT_HOST'] || @config.rabbit_host
-      @config.exchange_name = ENV['EVENTBUS_EXCHANGE_NAME'] || @config.exchange_name
+      @config.rabbit_host = ENV['PHILOTIC_RABBIT_HOST'] || @config.rabbit_host
+      @config.exchange_name = ENV['PHILOTIC_EXCHANGE_NAME'] || @config.exchange_name
     end
 
     def connect! &block

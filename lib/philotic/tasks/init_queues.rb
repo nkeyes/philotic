@@ -1,5 +1,5 @@
 desc "initialize named durable queues"
-namespace :eb do
+namespace :philotic do
   task :init_queues, :filename do |t, args|
     raise "You must specify a file name for #{t.name}: rake #{t.name}[FILENAME] #yes, you need the brackets, no space." if !args[:filename]
 

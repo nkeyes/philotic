@@ -4,7 +4,7 @@ module Philotic
   class Event
     include Philotic::Routable
     def self.inherited(sub)
-      Philotic::EVENTBUS_HEADERS.each do |header|
+      Philotic::PHILOTIC_HEADERS.each do |header|
         sub.attr_routable header
       end
       self.attr_routable_readers.dup.each do |routable|
