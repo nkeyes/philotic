@@ -20,5 +20,5 @@ end
 Dir["tasks/**/*.rake"].each { |ext| load ext }
 
 task :spec
-task :default => :spec
+task default: :spec
 

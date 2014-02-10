@@ -50,9 +50,9 @@ module Philotic
         hash_payload = JSON.parse payload
 
         event = {
-            :payload => hash_payload,
-            :headers => metadata.attributes[:headers],
-            :attributes => metadata.attributes[:headers] ? hash_payload.merge(metadata.attributes[:headers]) : hash_payload
+            payload: hash_payload,
+            headers: metadata.attributes[:headers],
+            attributes: metadata.attributes[:headers] ? hash_payload.merge(metadata.attributes[:headers]) : hash_payload
         }
         block.call(metadata, event)
       end

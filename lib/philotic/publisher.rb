@@ -17,7 +17,7 @@ module Philotic
     end
 
     def publish(event, &block)
-      message_metadata = {:headers => event.headers}
+      message_metadata = {headers: event.headers}
       message_metadata.merge!(event.message_metadata) if event.message_metadata
       raw_publish(event.payload, message_metadata, &block)
     end
@@ -54,7 +54,7 @@ module Philotic
       end
       message_metadata = publish_defaults.merge message_metadata
       message_metadata[:headers] ||= {}
-      message_metadata[:headers] = {:philotic_firehose => true}.merge(message_metadata[:headers])
+      message_metadata[:headers] = {philotic_firehose: true}.merge(message_metadata[:headers])
 
 
       payload.each { |k, v| payload[k] = v.utc if v.is_a? ActiveSupport::TimeWithZone }

@@ -11,8 +11,8 @@ require 'philotic'
 Bundler.require(:default, :test)
 
 RSpec.configure do |config|
-  #Run any specs tagged with :focus => true or all specs if none tagged
-  config.filter_run :focus => true
+  #Run any specs tagged with focus: true or all specs if none tagged
+  config.filter_run focus: true
   config.run_all_when_everything_filtered = true
 
   config.after do

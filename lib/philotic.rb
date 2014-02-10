@@ -46,12 +46,12 @@ module Philotic
   ]
 
   DEFAULT_NAMED_QUEUE_OPTIONS = {
-      :auto_delete => false,
-      :durable => true
+      auto_delete: false,
+      durable: true
   }
   DEFAULT_ANONYMOUS_QUEUE_OPTIONS = {
-      :auto_delete => true,
-      :durable => false
+      auto_delete: true,
+      durable: false
   }
 
   DEFAULT_SUBSCRIBE_OPTIONS = {}

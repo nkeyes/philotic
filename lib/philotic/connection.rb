@@ -35,7 +35,7 @@ module Philotic
             on_tcp_connection_failure: @config.connection_failed_handler,
         }
 
-        AMQP.start(connection_settings, :logging => true) do |connection, connect_ok|
+        AMQP.start(connection_settings, logging: true) do |connection, connect_ok|
           @connection = connection
 
           if connected?

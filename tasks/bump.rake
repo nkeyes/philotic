@@ -1,5 +1,5 @@
 desc 'shortcut for bump:patch'
-task :bump => 'bump:patch'
+task bump: 'bump:patch'
 
 namespace :bump do
   desc 'Bump x.y.Z'

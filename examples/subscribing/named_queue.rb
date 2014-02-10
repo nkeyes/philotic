@@ -11,7 +11,7 @@ EventMachine.run do
   Signal.trap("TERM") { EventMachine.stop }
   
   #explicitly create a named queue for this example
-  Philotic.initialize_named_queue!('test_queue', :"x-match" => 'any', :gender => :M, :available => true)
+  Philotic.initialize_named_queue!('test_queue', :"x-match" => 'any', gender: :M, available: true)
   
   # give it time to actually create the queue, then subscribe
   EM.add_timer(3) do

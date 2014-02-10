@@ -15,9 +15,9 @@ EventMachine.run do
   # consume ansible + subspace + new_message events
   ansible_arguments = {
     "x-match" => :all,
-    :event_bus_product => :ansible,
-    :philotic_component => :subspace,
-    :philotic_event_type => :new_message,
+    event_bus_product: :ansible,
+    philotic_component: :subspace,
+    philotic_event_type: :new_message,
   }
   Philotic.initialize_named_queue!('ansible.new_messages', ansible_arguments, &queue_after_initialize_handler)
 
