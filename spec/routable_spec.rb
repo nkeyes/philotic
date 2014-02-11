@@ -39,7 +39,7 @@ describe Philotic::Routable do
       end
 
       it 'should call Philotic::Publisher.publish with subject' do
-        Philotic::Publisher.any_instance.should_receive(:publish).with(subject)
+        Philotic::Publisher.should_receive(:publish).with(subject)
         subject.publish
       end 
 
@@ -49,9 +49,9 @@ describe Philotic::Routable do
 
       context " overriding a value with message_metadata=" do
         before do
-          routable_event_instance.message_metadata = { :mandatory => false } 
+          routable_event_instance.message_metadata = { mandatory: false }
         end
-        its(:message_metadata) { should eq( :mandatory => false ) }
+        its(:message_metadata) { should eq( mandatory: false ) }
       end
     end
   end

@@ -35,8 +35,8 @@ EventMachine.run do
       dummy_event.gender = [:F, :M].sample
 
 
-      dummy_event.message_metadata = {:mandatory => true}
-      dummy_event.message_metadata = {:app_id => 'PHX'}
+      dummy_event.message_metadata = {mandatory: true}
+      dummy_event.message_metadata = {app_id: 'PHX'}
       dummy_event.message = "Message #{number}: Hey #{dummy_event.gender == :M ? 'dude' : 'dudette'}"
       dummy_event.publish
 

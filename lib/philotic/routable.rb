@@ -6,7 +6,7 @@ module Philotic
     def self.included(base)
       base.send :include, ActiveRecord::Validations
       base.send :include, ActiveRecord::Callbacks
-      base.validates :philotic_firehose, :philotic_product, :philotic_component, :philotic_event_type, :presence => true
+      base.validates :philotic_firehose, :philotic_product, :philotic_component, :philotic_event_type, presence: true
 
       base.extend ClassMethods
     end

@@ -4,8 +4,8 @@ require 'singleton'
 require 'forwardable'
 
 module Philotic
-  class Config
-    include Singleton
+  module Config
+    extend self
 
     ENV_PREFIX = 'PHILOTIC'
 
@@ -39,18 +39,27 @@ module Philotic
     DEFAULT_TIMESTAMP = nil
     DEFAULT_EXPIRATION = nil
 
-    Config.constants.each { |c| attr_accessor c.slice(8..-1).downcase.to_sym if c.to_s.start_with? 'DEFAULT_' }
-
-    def initialize(opts = {})
-      load defaults.merge opts
-    end
-
     def defaults
       @defaults ||= Hash[Config.constants.select { |c| c.to_s.start_with? 'DEFAULT_' }.collect do |c|
         key = c.slice(8..-1).downcase.to_sym
-        [key, ENV["#{ENV_PREFIX}_#{key}"] || Config.const_get(c)]
+
+        env_key = "#{ENV_PREFIX}_#{key}".upcase
+
+        [key, ENV[env_key] || Config.const_get(c)]
       end
       ]
+    end
+
+    Config.constants.each do |c|
+      if c.to_s.start_with? 'DEFAULT_'
+        attr_symbol = c.slice(8..-1).downcase.to_sym
+        attr_writer attr_symbol
+        class_eval %Q{
+          def #{attr_symbol}
+            @#{attr_symbol} ||= defaults[:#{attr_symbol}]
+          end
+        }
+      end
     end
 
     def load(config)
@@ -66,11 +75,5 @@ module Philotic
       config = YAML.load_file(filename)
       load(config[env])
     end
-
-    class << self
-      extend Forwardable
-      def_delegators :instance, *Config.instance_methods(false)
-    end
-
   end
 end
