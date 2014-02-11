@@ -3,6 +3,7 @@ require 'philotic/connection'
 module Philotic
   class Event
     include Philotic::Routable
+
     def self.inherited(sub)
       Philotic::PHILOTIC_HEADERS.each do |header|
         sub.attr_routable header
@@ -10,7 +11,7 @@ module Philotic
       self.attr_routable_readers.dup.each do |routable|
         sub.attr_routable routable
       end
-      
+
       self.attr_payload_readers.dup.each do |payload|
         sub.attr_payload payload
       end
@@ -30,23 +31,14 @@ module Philotic
       Philotic::Connection.instance
     end
 
-    def initialize(options={})
-      self.timestamp = Time.now.to_i
-      self.philotic_firehose = true
-
-      # dynamically insert any passed in options into both attr_routable
-      # and attr_payload
-      # result:  ability to arbitrarily send a easily routable hash
-      # over into the bus
-      options.each do |key, value|
+    def set_routables_or_payloads(type, attrs)
+      attrs.each do |key, value|
         if self.respond_to?(:"#{key}=")
           send(:"#{key}=", value)
         elsif self.class == Philotic::Event
-          self.class.attr_routable_readers.concat([key])
-          self.class.attr_routable_writers.concat([:"#{key}="])
+          self.class.send("attr_#{type}_readers").concat([key])
+          self.class.send("attr_#{type}_writers").concat([:"#{key}="])
 
-          self.class.attr_payload_readers.concat([key])
-          self.class.attr_payload_writers.concat([:"#{key}="])
           setter = Proc.new do |v|
             instance_variable_set(:"@#{key}", v)
           end
@@ -58,7 +50,19 @@ module Philotic
           self.class.send :define_method, :"#{key}", getter
         end
       end
+    end
 
+    def initialize(routables={}, payloads=nil)
+      payloads ||= {}
+      self.timestamp = Time.now.to_i
+      self.philotic_firehose = true
+
+      # dynamically insert any passed in routables into both attr_routable
+      # and attr_payload
+      # result:  ability to arbitrarily send a easily routable hash
+      # over into the bus
+      set_routables_or_payloads(:routable, routables)
+      set_routables_or_payloads(:payload, payloads)
       self
     end
   end
