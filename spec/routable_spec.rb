@@ -39,7 +39,7 @@ describe Philotic::Routable do
       end
 
       it 'should call Philotic::Publisher.publish with subject' do
-        Philotic::Publisher.any_instance.should_receive(:publish).with(subject)
+        Philotic::Publisher.should_receive(:publish).with(subject)
         subject.publish
       end 
 

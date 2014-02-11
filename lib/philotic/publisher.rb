@@ -1,16 +1,7 @@
 require 'philotic/connection'
 module Philotic
-  class Publisher
-    include Singleton
-
-    def initialize
-      unless config.disable_publish
-        Philotic.logger.info "publishing enabled"
-      else
-        Philotic.logger.info "publishing disabled"
-      end
-
-    end
+  module Publisher
+    extend self
 
     def config
       Philotic::Config
@@ -31,18 +22,6 @@ module Philotic
           _raw_publish payload, message_metadata, &block
         end
       end
-    end
-
-    def self.config
-      instance.config
-    end
-
-    def self.publish(event, &block)
-      instance.publish(event, &block)
-    end
-
-    def self.raw_publish(payload, message_metadata = {})
-      instance.raw_publish(payload, message_metadata = {})
     end
 
     private
@@ -74,8 +53,6 @@ module Philotic
         return
       end
       Thread.new { Philotic::Connection.exchange.publish(payload.to_json, message_metadata, &callback) }
-
-
     end
   end
 end

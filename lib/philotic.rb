@@ -135,8 +135,8 @@ module Philotic
   end
 end
 
-require 'philotic/connection'
 require 'philotic/version'
+require 'philotic/connection'
 require 'philotic/config'
 require 'philotic/routable'
 require 'philotic/event'
