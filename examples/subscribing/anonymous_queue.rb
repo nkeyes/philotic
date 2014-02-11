@@ -12,7 +12,7 @@ EventMachine.run do
   Philotic::Config.load_file(File.join(File.dirname(__FILE__), "../../", "philotic.yml"))
 
 
-  Philotic::Subscriber.subscribe(event_bus_fire_hose: true) do |metadata, payload|
+  Philotic::Subscriber.subscribe(philotic_fire_hose: true) do |metadata, payload|
     p metadata.attributes
     p payload
   end

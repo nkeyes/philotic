@@ -15,7 +15,7 @@ EventMachine.run do
   # consume ansible + subspace + new_message events
   ansible_arguments = {
     "x-match" => :all,
-    event_bus_product: :ansible,
+    philotic_product: :ansible,
     philotic_component: :subspace,
     philotic_event_type: :new_message,
   }
