@@ -20,4 +20,4 @@ RSpec.configure do |config|
   end
   
 end
-#Philotic.logger = Logger.new("/dev/null")
+Philotic.logger = Logger.new("/dev/null")

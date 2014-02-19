@@ -5,7 +5,6 @@ require 'pathname'
 
 require 'logger'
 
-
 module Philotic
   mattr_accessor :logger
   mattr_accessor :log_event_handler
@@ -68,35 +67,43 @@ module Philotic
     Philotic::Connection.exchange
   end
 
-  def self.initialize_named_queue!(queue_name, config, &block)
+  def self.delete_queue(queue_name, config, &block)
     config = config.deep_symbolize_keys
 
-
-    raise "ENV['INITIALIZE_NAMED_QUEUE'] must equal 'true' to run Philotic.initialize_named_queue!" unless ENV['INITIALIZE_NAMED_QUEUE'] == 'true'
     connect! do
       queue_options = DEFAULT_NAMED_QUEUE_OPTIONS.dup
       queue_options.merge!(config[:options] || {})
 
       AMQP.channel.queue(queue_name, queue_options) do |old_queue|
-        old_queue.delete do
-          Philotic::Connection.close do
-            connect! do
-              Philotic.logger.info "deleted old queue. queue:#{queue_name}"
+        old_queue.delete(&block)
+      end
+    end
+  end
 
-              bindings = Array(config[:bindings])
+  def self.initialize_named_queue!(queue_name, config, &block)
+    config = config.deep_symbolize_keys
 
-              queue_exchange = config[:exchange] ? AMQP.channel.headers(config[:exchange], durable: true) : exchange
+    raise "ENV['INITIALIZE_NAMED_QUEUE'] must equal 'true' to run Philotic.initialize_named_queue!" unless ENV['INITIALIZE_NAMED_QUEUE'] == 'true'
 
-              AMQP.channel.queue(queue_name, queue_options) do |q|
-                Philotic.logger.info "Created queue. queue:#{q.name}"
-                bindings.each_with_index do |arguments, arguments_index|
-                  q.bind(queue_exchange, { arguments: arguments }) do
-                    Philotic.logger.info "Added binding to queue. queue:#{q.name} binding:#{arguments}"
-                    if arguments_index >= bindings.size - 1
-                      Philotic.logger.info "Finished adding bindings to queue. queue:#{q.name}"
-                      block.call(q) if block
-                    end
-                  end
+    delete_queue(queue_name, config) do
+      Philotic::Connection.close do
+        connect! do
+          Philotic.logger.info "deleted old queue. queue:#{queue_name}"
+
+          bindings = Array(config[:bindings])
+
+          queue_exchange = config[:exchange] ? AMQP.channel.headers(config[:exchange], durable: true) : exchange
+          queue_options = DEFAULT_NAMED_QUEUE_OPTIONS.dup
+          queue_options.merge!(config[:options] || {})
+
+          AMQP.channel.queue(queue_name, queue_options) do |q|
+            Philotic.logger.info "Created queue. queue:#{q.name}"
+            bindings.each_with_index do |arguments, arguments_index|
+              q.bind(queue_exchange, { arguments: arguments }) do
+                Philotic.logger.info "Added binding to queue. queue:#{q.name} binding:#{arguments}"
+                if arguments_index >= bindings.size - 1
+                  Philotic.logger.info "Finished adding bindings to queue. queue:#{q.name}"
+                  block.call(q) if block
                 end
               end
             end
