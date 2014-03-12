@@ -13,10 +13,10 @@ module Philotic
       Philotic::Config
     end
 
-    def connect! &block
+    def connect!
       if connected?
         Philotic.logger.info "already connected to RabbitMQ; host:#{config.rabbit_host}"
-        block.call if block
+        yield if block_given?
         return
       end
 
@@ -52,18 +52,23 @@ module Philotic
           end
 
           setup_exchange_handler!
-          block.call if block
+          yield if block_given?
 
         end #AMQP.start
       end
     end
 
-    def close &block
-      if connected?
-        connection.close &block
+    def close
+      if block_given?
+        if connected?
+          connection.close &Proc.new
+        else
+          yield
+        end
       else
-        block.call
+        connection.close
       end
+
     end
 
     def connected?

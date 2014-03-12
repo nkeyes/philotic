@@ -7,10 +7,14 @@ module Philotic
       Philotic::Config
     end
 
-    def publish(event, &block)
-      message_metadata = {headers: event.headers}
+    def publish(event)
+      message_metadata = { headers: event.headers }
       message_metadata.merge!(event.message_metadata) if event.message_metadata
-      raw_publish(event.payload, message_metadata, &block)
+      if block_given?
+        raw_publish(event.payload, message_metadata, &Proc.new)
+      else
+        raw_publish(event.payload, message_metadata)
+      end
     end
 
     def raw_publish(payload, message_metadata = {}, &block)
@@ -25,7 +29,7 @@ module Philotic
     end
 
     private
-    def _raw_publish(payload, message_metadata = {}, &block)
+    def _raw_publish(payload, message_metadata = {})
 
       publish_defaults = {}
       Philotic::MESSAGE_OPTIONS.each do |key|
@@ -33,14 +37,14 @@ module Philotic
       end
       message_metadata = publish_defaults.merge message_metadata
       message_metadata[:headers] ||= {}
-      message_metadata[:headers] = {philotic_firehose: true}.merge(message_metadata[:headers])
+      message_metadata[:headers] = { philotic_firehose: true }.merge(message_metadata[:headers])
 
 
       payload.each { |k, v| payload[k] = v.utc if v.is_a? ActiveSupport::TimeWithZone }
 
-      callback = Proc.new do
+      callback = lambda do
         Philotic.log_event_published(:debug, message_metadata, payload, 'published event')
-        block.call if block
+        yield if block_given?
       end
 
       if config.disable_publish

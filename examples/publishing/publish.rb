@@ -15,7 +15,7 @@ EventMachine.run do
 
   Philotic::Config.load_file(File.join(File.dirname(__FILE__), "../../", "philotic.yml"))
 
-  #Philotic::Config.message_return_handler = Proc.new { |basic_return, metadata, payload|
+  #Philotic::Config.message_return_handler = lambda { |basic_return, metadata, payload|
   #  p "overridden"
   #  Philotic.logger.warn "#{JSON.parse payload} was returned! reply_code = #{basic_return.reply_code}, reply_text = #{basic_return.reply_text}"
   #}

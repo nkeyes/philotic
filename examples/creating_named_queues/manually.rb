@@ -9,7 +9,7 @@ EventMachine.run do
   Signal.trap("INT")  { EventMachine.stop }
   Signal.trap("TERM") { EventMachine.stop }
   
-  queue_after_initialize_handler = Proc.new do |q|
+  queue_after_initialize_handler = lambda do |q|
     Philotic.logger.info "Queue '#{q.name}' initialized: #{q.bindings}"
   end
   # consume ansible + subspace + new_message events

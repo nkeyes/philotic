@@ -39,10 +39,10 @@ module Philotic
           self.class.send("attr_#{type}_readers").concat([key])
           self.class.send("attr_#{type}_writers").concat([:"#{key}="])
 
-          setter = Proc.new do |v|
+          setter = lambda do |v|
             instance_variable_set(:"@#{key}", v)
           end
-          getter = Proc.new do
+          getter = lambda do
             instance_variable_get(:"@#{key}")
           end
           self.class.send :define_method, :"#{key}=", setter
