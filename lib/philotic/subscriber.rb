@@ -64,7 +64,7 @@ module Philotic
         arguments['x-match'] ||= 'all'
       end
 
-      queue_options = queue_options.merge(options[:queue_options] || {})
+      queue_options.merge!(options[:queue_options] || {})
 
       queue_options[:auto_delete] ||= true if queue_name == ''
 
