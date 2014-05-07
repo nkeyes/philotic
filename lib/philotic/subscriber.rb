@@ -53,15 +53,18 @@ module Philotic
 
       if options.is_a? String
         queue_name = options
-        queue_options = Philotic::DEFAULT_NAMED_QUEUE_OPTIONS
+        options = subscribe_options
+        queue_options  = Philotic::DEFAULT_NAMED_QUEUE_OPTIONS
+
       else
         queue_name = options[:queue_name] || ''
-
-        queue_options = Philotic::DEFAULT_ANONYMOUS_QUEUE_OPTIONS.merge(options[:queue_options] || {})
+        queue_options = Philotic::DEFAULT_ANONYMOUS_QUEUE_OPTIONS
         subscribe_options = subscribe_options.merge(options[:subscribe_options]) if options[:subscribe_options]
         arguments = options[:arguments] || options
         arguments['x-match'] ||= 'all'
       end
+
+      queue_options = queue_options.merge(options[:queue_options] || {})
 
       queue_options[:auto_delete] ||= true if queue_name == ''
 
