@@ -1,5 +1,12 @@
 module Philotic
   class Subscriber
+    class Metadata
+      attr_accessor :attributes
+      def initialize(attributes)
+        self.attributes = attributes
+      end
+    end
+
     def self.subscribe(options = {}, subscribe_options = Philotic::DEFAULT_SUBSCRIBE_OPTIONS)
       if block_given?
         if Philotic.connected?
@@ -49,7 +56,7 @@ module Philotic
 
     private
     def self._subscribe(options = {}, subscribe_options = Philotic::DEFAULT_SUBSCRIBE_OPTIONS)
-      @@exchange = Philotic::Connection.exchange
+      @exchange = Philotic::Connection.exchange
 
       if options.is_a? String
         queue_name = options
@@ -68,19 +75,19 @@ module Philotic
 
       queue_options[:auto_delete] ||= true if queue_name == ''
 
-      callback = lambda do |metadata, payload|
+      callback = lambda do |delivery_info, metadata, payload|
         hash_payload = JSON.parse payload
 
         event = {
             payload: hash_payload,
-            headers: metadata.attributes[:headers],
-            attributes: metadata.attributes[:headers] ? hash_payload.merge(metadata.attributes[:headers]) : hash_payload
+            headers: metadata[:headers],
+            attributes: metadata[:headers] ? hash_payload.merge(metadata[:headers]) : hash_payload
         }
-        Proc.new.call(metadata, event)
+        Proc.new.call(Metadata.new(metadata), event)
       end
-      q = AMQP.channel.queue(queue_name, queue_options)
+      q = Philotic::Connection.channel.queue(queue_name, queue_options)
 
-      q.bind(@@exchange, arguments: arguments) if arguments
+      q.bind(@exchange, arguments: arguments) if arguments
 
       q.subscribe(subscribe_options, &callback)
 

@@ -56,7 +56,8 @@ module Philotic
         Philotic.log_event_published(:error, message_metadata, payload, 'unable to publish event, not connected to amqp broker')
         return
       end
-      Thread.new { Philotic::Connection.exchange.publish(payload.to_json, message_metadata, &callback) }
+      Philotic::Connection.exchange.publish(payload.to_json, message_metadata)
+      callback.call
     end
   end
 end

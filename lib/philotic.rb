@@ -90,7 +90,7 @@ module Philotic
         connect! do
           Philotic.logger.info "deleted old queue. queue:#{queue_name}"
 
-          bindings = Array(config[:bindings])
+          bindings = config[:bindings]
 
           queue_exchange = config[:exchange] ? AMQP.channel.headers(config[:exchange], durable: true) : exchange
           queue_options = DEFAULT_NAMED_QUEUE_OPTIONS.dup
