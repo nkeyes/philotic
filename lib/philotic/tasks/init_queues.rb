@@ -10,19 +10,9 @@ namespace :philotic do
 
     @filename = args[:filename]
     queues = YAML.load_file(@filename)
-
-    EM.run do
-      def init_queues queues, index = 0
-        Philotic.initialize_named_queue!("#{queues.keys.sort[index]}", queues[queues.keys.sort[index]]) do |q|
-          if index == queues.size - 1
-            Philotic::Connection.close { EM.stop }
-          else
-            init_queues queues, index + 1
-          end
-        end
-      end
-
-      init_queues queues
+    Philotic.connect!
+    queues.each_pair do |queue_name, queue_options|
+      Philotic.initialize_named_queue!(queue_name, queue_options)
     end
   end
 end
