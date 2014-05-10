@@ -16,9 +16,9 @@ Gem::Specification.new do |gem|
   gem.version       = Philotic::VERSION
   gem.licenses       = ['MIT']
 
-  gem.add_dependency 'activesupport', '~> 4.0'
-  gem.add_dependency 'activerecord', '~> 4.0'
-  gem.add_dependency 'amqp', '~> 1.2'
+  gem.add_dependency 'activesupport', '>= 3.2'
+  gem.add_dependency 'activerecord', '>= 3.2'
   gem.add_dependency 'awesome_print', '~> 1.2'
+  gem.add_dependency 'bunny', '~> 1.2.1'
   gem.add_dependency 'json', '~> 1.8'
 end

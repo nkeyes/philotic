@@ -18,9 +18,9 @@ module Philotic
     DEFAULT_RABBIT_PASSWORD = 'guest'
     DEFAULT_RABBIT_VHOST = '/'
     DEFAULT_EXCHANGE_NAME = 'philotic.headers'
-    DEFAULT_CONNECTION_FAILED_HANDLER = Proc.new { |settings| Philotic.logger.error "RabbitMQ connection failure; host:#{rabbit_host}" }
-    DEFAULT_CONNECTION_LOSS_HANDLER = Proc.new { |conn, settings| Philotic.logger.warn "RabbitMQ connection loss; host:#{rabbit_host}"; conn.reconnect(false, 2) }
-    DEFAULT_MESSAGE_RETURN_HANDLER = Proc.new { |basic_return, metadata, payload| Philotic.logger.warn "Philotic message #{JSON.parse payload} was returned! reply_code = #{basic_return.reply_code}, reply_text = #{basic_return.reply_text} headers = #{metadata.properties}"; }
+    DEFAULT_CONNECTION_FAILED_HANDLER = lambda { |settings| Philotic.logger.error "RabbitMQ connection failure; host:#{rabbit_host}" }
+    DEFAULT_CONNECTION_LOSS_HANDLER = lambda { |conn, settings| Philotic.logger.warn "RabbitMQ connection loss; host:#{rabbit_host}"; conn.reconnect(false, 2) }
+    DEFAULT_MESSAGE_RETURN_HANDLER = lambda { |basic_return, metadata, payload| Philotic.logger.warn "Philotic message #{JSON.parse payload} was returned! reply_code = #{basic_return.reply_code}, reply_text = #{basic_return.reply_text} headers = #{metadata.properties}"; }
     DEFAULT_TIMEOUT = 2
 
     DEFAULT_ROUTING_KEY = nil
