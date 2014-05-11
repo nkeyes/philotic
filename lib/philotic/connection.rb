@@ -5,10 +5,13 @@ require 'bunny'
 module Philotic
   module Connection
     extend self
-    attr_reader :connection
 
     def config
       Philotic::Config
+    end
+
+    def connection
+      Thread.current[:philotic_connection_instance]
     end
 
     def connect!
@@ -24,21 +27,19 @@ module Philotic
           user: config.rabbit_user,
           password: config.rabbit_password,
           vhost: config.rabbit_vhost,
-          timeout: config.timeout,
+          timeout: config.timeout.to_i,
           automatically_recover: true,
           on_tcp_connection_failure: config.connection_failed_handler,
       }
 
-      @connection = Bunny.new(connection_settings)
-      @connection.start
+      Thread.current[:philotic_connection_instance] = Bunny.new(connection_settings)
+      Thread.current[:philotic_connection_instance].start
 
       if connected?
         Philotic.logger.info "connected to RabbitMQ; host:#{config.rabbit_host}"
       else
         Philotic.logger.warn "failed connected to RabbitMQ; host:#{config.rabbit_host}"
       end
-
-
 
       #@connection.on_tcp_connection_loss do |cl, settings|
       #  config.method(:connection_loss_handler).call.call(cl, settings)
@@ -54,15 +55,8 @@ module Philotic
     end
 
     def close
-      if block_given?
-        if connected?
-          connection.close &Proc.new
-        else
-          yield
-        end
-      else
-        connection.close
-      end
+      connection.close if connected?
+      yield if block_given?
     end
 
     def connected?
@@ -70,11 +64,11 @@ module Philotic
     end
 
     def channel
-      @channel ||= connection.create_channel
+      Thread.current[:philotic_channel_instance] ||= connection.create_channel
     end
 
     def exchange
-      @exchange ||= channel.headers(config.exchange_name, durable: true)
+      Thread.current[:philotic_exchange_instance] ||= channel.headers(config.exchange_name, durable: true)
     end
 
     def setup_exchange_handler!

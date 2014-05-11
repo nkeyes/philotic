@@ -11,9 +11,10 @@ require 'philotic'
 #Philotic.initialize_named_queue!('test_queue', bindings: [{ :"x-match" => 'any', gender: :M, available: true }])
 
 
-# give it time to actually create the queue, then subscribe
+count = 0
 Philotic::Subscriber.subscribe('test_queue') do |metadata, payload|
-  print "#{payload[:payload]['message']}                \r"
+  count += 1
+  print "#{payload[:payload]['message']} (#{count} total)                \r"
 end
 while true
   sleep 1
