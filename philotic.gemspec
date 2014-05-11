@@ -24,5 +24,4 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'json', '~> 1.8'
   gem.add_dependency 'thread'
 
-
 end
