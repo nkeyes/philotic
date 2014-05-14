@@ -39,6 +39,9 @@ module Philotic
     DEFAULT_TIMESTAMP = nil
     DEFAULT_EXPIRATION = nil
 
+    DEFAULT_THREADED_PUBLISH = false
+    DEFAULT_THREADED_PUBLISH_POOL_SIZE = 10
+
     def defaults
       @defaults ||= Hash[Config.constants.select { |c| c.to_s.start_with? 'DEFAULT_' }.collect do |c|
         key = c.slice(8..-1).downcase.to_sym

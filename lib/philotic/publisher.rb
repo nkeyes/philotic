@@ -1,4 +1,6 @@
 require 'philotic/connection'
+require 'thread/pool'
+
 module Philotic
   module Publisher
     extend self
@@ -8,13 +10,25 @@ module Philotic
     end
 
     def publish(event)
-      message_metadata = { headers: event.headers }
-      message_metadata.merge!(event.message_metadata) if event.message_metadata
-      if block_given?
-        raw_publish(event.payload, message_metadata, &Proc.new)
-      else
+
+      publish_callback = lambda do
+        message_metadata = { headers: event.headers }
+        message_metadata.merge!(event.message_metadata) if event.message_metadata
         raw_publish(event.payload, message_metadata)
+        yield if block_given?
+        #Thread.pass
       end
+
+      if config.threaded_publish
+        @publish_pool ||= Thread::Pool.new(config.threaded_publish_pool_size)
+        @publish_pool.process do
+          publish_callback.call
+          #Thread.pass
+        end
+      else
+        publish_callback.call
+      end
+      #Thread.pass
     end
 
     def raw_publish(payload, message_metadata = {}, &block)
@@ -56,7 +70,8 @@ module Philotic
         Philotic.log_event_published(:error, message_metadata, payload, 'unable to publish event, not connected to amqp broker')
         return
       end
-      Thread.new { Philotic::Connection.exchange.publish(payload.to_json, message_metadata, &callback) }
+      Philotic::Connection.exchange.publish(payload.to_json, message_metadata)
+      callback.call
     end
   end
 end
