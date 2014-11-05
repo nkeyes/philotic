@@ -2,13 +2,13 @@
 $:.unshift File.expand_path('../../../lib', __FILE__)
 $stdout.sync = true
 
-require 'pry'
 require 'philotic'
 
+# explicitly create a named queue for this example
+ENV['INITIALIZE_NAMED_QUEUE'] = 'true'
+# Philotic::Connection.connect!
 
-#explicitly create a named queue for this example
-#ENV['INITIALIZE_NAMED_QUEUE'] = 'true'
-#Philotic.initialize_named_queue!('test_queue', bindings: [{ :"x-match" => 'any', gender: :M, available: true }])
+# Philotic.initialize_named_queue!('test_queue', bindings: [{ :"x-match" => 'any', gender: :M, available: true }])
 
 
 count = 0

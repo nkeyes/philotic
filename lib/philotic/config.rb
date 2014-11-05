@@ -11,7 +11,6 @@ module Philotic
 
     DEFAULT_DISABLE_PUBLISH = false
 
-
     DEFAULT_RABBIT_HOST = 'localhost'
     DEFAULT_RABBIT_PORT = 5672
     DEFAULT_RABBIT_USER = 'guest'
@@ -38,9 +37,6 @@ module Philotic
     DEFAULT_APP_ID = nil
     DEFAULT_TIMESTAMP = nil
     DEFAULT_EXPIRATION = nil
-
-    DEFAULT_THREADED_PUBLISH = false
-    DEFAULT_THREADED_PUBLISH_POOL_SIZE = 10
 
     def defaults
       @defaults ||= Hash[Config.constants.select { |c| c.to_s.start_with? 'DEFAULT_' }.collect do |c|

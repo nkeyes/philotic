@@ -1,19 +1,30 @@
 require 'spec_helper'
 
 describe Philotic::Connection do
-  let(:connection){ Philotic::Connection }
-  subject { connection } 
-  
-  describe "config" do
-    it "should return the Philotic::Config singleton" do
-      subject.config.should == Philotic::Config
-    end
+
+  describe '.config' do
+    its(:config) { should eq Philotic::Config }
   end
-  
-  describe "exchange" do
-    #TODO make sure rabbit is running for CI to run this
-    xit "should return an instance of AMQP::Exchange" do
-      subject.exchange.should be_a AMQP::Exchange
-    end
+
+  describe '.connection' do
   end
+
+  describe '.connect!' do
+  end
+
+  describe '.close' do
+  end
+
+  describe '.connected?' do
+  end
+
+  describe '.channel' do
+  end
+
+  describe '.exchange' do
+  end
+
+  describe '.setup_exchange_handler!' do
+  end
+
 end

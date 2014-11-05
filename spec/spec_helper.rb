@@ -6,7 +6,9 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), 'config'))
 
 require 'rubygems'
 require 'bundler/setup'
+require 'rspec/its'
 require 'philotic'
+require 'timecop'
 
 Bundler.require(:default, :test)
 

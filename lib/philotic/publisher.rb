@@ -1,5 +1,4 @@
 require 'philotic/connection'
-require 'thread/pool'
 
 module Philotic
   module Publisher
@@ -10,24 +9,11 @@ module Philotic
     end
 
     def publish(event)
+      message_metadata = {headers: event.headers}
+      message_metadata.merge!(event.message_metadata) if event.message_metadata
+      raw_publish(event.payload, message_metadata)
+      yield if block_given?
 
-      publish_callback = lambda do
-        message_metadata = { headers: event.headers }
-        message_metadata.merge!(event.message_metadata) if event.message_metadata
-        raw_publish(event.payload, message_metadata)
-        yield if block_given?
-        #Thread.pass
-      end
-
-      if config.threaded_publish
-        @publish_pool ||= Thread::Pool.new(config.threaded_publish_pool_size)
-        @publish_pool.process do
-          publish_callback.call
-          #Thread.pass
-        end
-      else
-        publish_callback.call
-      end
       #Thread.pass
     end
 
@@ -51,7 +37,7 @@ module Philotic
       end
       message_metadata = publish_defaults.merge message_metadata
       message_metadata[:headers] ||= {}
-      message_metadata[:headers] = { philotic_firehose: true }.merge(message_metadata[:headers])
+      message_metadata[:headers] = {philotic_firehose: true}.merge(message_metadata[:headers])
 
 
       payload.each { |k, v| payload[k] = v.utc if v.is_a? ActiveSupport::TimeWithZone }

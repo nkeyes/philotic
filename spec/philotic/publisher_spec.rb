@@ -28,7 +28,7 @@ describe Philotic::Publisher do
   describe "publish" do
     it "should call raw_publish with the right values" do
       Timecop.freeze
-      subject.should_receive(:raw_publish).with(
+      expect(subject).to receive(:raw_publish).with(
           {
               subject: 'Hello',
               message: "How are you?"
