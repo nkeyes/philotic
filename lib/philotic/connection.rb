@@ -7,14 +7,12 @@ require 'philotic/config'
 module Philotic
   module Connection
     extend self
+    attr_reader :connection
 
     def config
       Philotic::Config
     end
 
-    def connection
-      Thread.current[:philotic_connection_instance]
-    end
 
     def connect!
       if connected?
@@ -34,8 +32,8 @@ module Philotic
           on_tcp_connection_failure: config.connection_failed_handler,
       }
 
-      Thread.current[:philotic_connection_instance] = Bunny.new(connection_settings)
-      Thread.current[:philotic_connection_instance].start
+      @connection = Bunny.new(connection_settings)
+      @connection.start
 
       if connected?
         Philotic.logger.info "connected to RabbitMQ; host:#{config.rabbit_host}"
@@ -57,6 +55,7 @@ module Philotic
     end
 
     def close
+      Philotic.logger.info "closing connection to RabbitMQ; host:#{config.rabbit_host}"
       connection.close if connected?
       yield if block_given?
     end
@@ -66,11 +65,11 @@ module Philotic
     end
 
     def channel
-      Thread.current[:philotic_channel_instance] ||= connection.create_channel
+      @channel ||= connection.create_channel
     end
 
     def exchange
-      Thread.current[:philotic_exchange_instance] ||= channel.headers(config.exchange_name, durable: true)
+      @exchange ||= channel.headers(config.exchange_name, durable: true)
     end
 
     def setup_exchange_handler!
