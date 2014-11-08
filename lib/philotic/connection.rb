@@ -2,6 +2,8 @@ require 'singleton'
 require 'json'
 require 'bunny'
 
+require 'philotic/config'
+
 module Philotic
   module Connection
     extend self

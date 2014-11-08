@@ -28,6 +28,5 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'activerecord', '>= 3.2'
   gem.add_dependency 'awesome_print', '~> 1.2'
   gem.add_dependency 'bunny', '~> 1.2.1'
-
   gem.add_dependency 'json', '~> 1.8'
 end

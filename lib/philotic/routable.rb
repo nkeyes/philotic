@@ -101,6 +101,10 @@ module Philotic
         attr_routable_writers.concat(names)
         attr_accessor(*names)
       end
+
+      def publish(*args, &block)
+        self.new(*args).publish(&block)
+      end
     end
   end
 end
