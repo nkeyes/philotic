@@ -24,13 +24,13 @@ module Philotic
       end
 
       connection_settings = {
-          host: config.rabbit_host,
-          port: config.rabbit_port,
-          user: config.rabbit_user,
-          password: config.rabbit_password,
-          vhost: config.rabbit_vhost,
-          timeout: config.timeout.to_i,
-          automatically_recover: true,
+          host:                      config.rabbit_host,
+          port:                      config.rabbit_port,
+          user:                      config.rabbit_user,
+          password:                  config.rabbit_password,
+          vhost:                     config.rabbit_vhost,
+          timeout:                   config.timeout.to_i,
+          automatically_recover:     true,
           on_tcp_connection_failure: config.connection_failed_handler,
       }
 

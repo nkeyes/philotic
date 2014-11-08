@@ -35,7 +35,7 @@ describe Philotic::Routable do
 
       it 'should have proper attributes' do
         subject.attributes.should == {routable_attr: nil,
-                                      payload_attr: nil}
+                                      payload_attr:  nil}
       end
 
       it 'should call Philotic::Publisher.publish with subject' do

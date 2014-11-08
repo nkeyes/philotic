@@ -11,7 +11,7 @@ ENV['INITIALIZE_NAMED_QUEUE'] = 'true'
 # Philotic.initialize_named_queue!('test_queue', bindings: [{ :"x-match" => 'any', gender: :M, available: true }])
 
 
-count = 0
+count                         = 0
 Philotic::Subscriber.subscribe('test_queue') do |metadata, payload|
   count += 1
   print "#{payload[:payload]['message']} (#{count} total)                \r"

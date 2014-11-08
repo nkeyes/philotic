@@ -6,12 +6,12 @@ require 'philotic'
 
 EventMachine.run do
 # hit Control + C to stop
-  Signal.trap("INT") { EventMachine.stop }
-  Signal.trap("TERM") { EventMachine.stop }
+  Signal.trap('INT') { EventMachine.stop }
+  Signal.trap('TERM') { EventMachine.stop }
 
   #explicitly create a named queue for this example
   ENV['INITIALIZE_NAMED_QUEUE'] = 'true'
-  Philotic.initialize_named_queue!('test_queue', bindings: [{ :"x-match" => 'any', gender: :M, available: true }])
+  Philotic.initialize_named_queue!('test_queue', bindings: [{:'x-match' => 'any', gender: :M, available: true}])
 
 
   # give it time to actually create the queue, then subscribe

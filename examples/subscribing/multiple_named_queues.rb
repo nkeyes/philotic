@@ -16,7 +16,7 @@ EventMachine.run do
   # ENV['INITIALIZE_NAMED_QUEUE'] must equal 'true' to run Philotic.initialize_named_queue!
   ENV['INITIALIZE_NAMED_QUEUE'] = 'true'
   Philotic.initialize_named_queue!('male_queue', :"x-match" => 'all', gender: :M, available: true) do
-      Philotic.initialize_named_queue!('female_queue', :"x-match" => 'all', gender: :F, available: true)
+    Philotic.initialize_named_queue!('female_queue', :"x-match" => 'all', gender: :F, available: true)
   end
 
   # give it time to actually create the queue, then subscribe

@@ -14,7 +14,7 @@ describe Philotic::Subscriber do
       queue = double(AMQP::Queue)
       queue.stub(:bind) { queue }
       queue.stub(:subscribe) { queue }
-      channel = double(AMQP::Channel)
+      channel  = double(AMQP::Channel)
       exchange = double(AMQP::Exchange)
       channel.stub(:queue) { queue }
       channel.stub(:headers) { exchange }
@@ -34,7 +34,7 @@ describe Philotic::Subscriber do
       queue = double(AMQP::Queue)
       queue.stub(:bind) { queue }
       queue.stub(:subscribe) { queue }
-      channel = double(AMQP::Channel)
+      channel  = double(AMQP::Channel)
       exchange = double(AMQP::Exchange)
       channel.stub(:queue) { queue }
       channel.stub(:headers) { exchange }
@@ -54,7 +54,7 @@ describe Philotic::Subscriber do
       queue = double(AMQP::Queue)
       queue.stub(:bind) { queue }
       queue.stub(:subscribe) { queue }
-      channel = double(AMQP::Channel)
+      channel  = double(AMQP::Channel)
       exchange = double(AMQP::Exchange)
       channel.stub(:queue) { queue }
       channel.stub(:headers) { exchange }

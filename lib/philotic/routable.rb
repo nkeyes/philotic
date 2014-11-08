@@ -14,7 +14,7 @@ module Philotic
     def payload
       attribute_hash = {}
       self.class.attr_payload_readers.each do |attr|
-        attr = attr.to_sym
+        attr                 = attr.to_sym
         attribute_hash[attr] = send(attr)
       end
       attribute_hash
@@ -23,7 +23,7 @@ module Philotic
     def headers
       attribute_hash = {}
       self.class.attr_routable_readers.each do |attr|
-        attr = attr.to_sym
+        attr                 = attr.to_sym
         attribute_hash[attr] = send(attr)
       end
       attribute_hash
@@ -32,7 +32,7 @@ module Philotic
     def attributes
       attribute_hash = {}
       (self.class.attr_payload_readers + self.class.attr_routable_readers).each do |attr|
-        attr = attr.to_sym
+        attr                 = attr.to_sym
         attribute_hash[attr] = send(attr)
       end
       attribute_hash

@@ -14,7 +14,7 @@ end
 
 RSpec::Core::RakeTask.new(:rcov) do |spec|
   spec.pattern = 'spec/**/*_spec.rb'
-  spec.rcov = true
+  spec.rcov    = true
 end
 
 Dir["tasks/**/*.rake"].each { |ext| load ext }

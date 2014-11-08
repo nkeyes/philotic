@@ -15,19 +15,19 @@ Philotic::Config.load_file(File.join(File.dirname(__FILE__), "../../", "philotic
 Philotic::Connection.connect!
 $dummy_event = Philotic::DummyEvent.new
 
-$dummy_event.philotic_firehose = true
-$dummy_event.philotic_product = 'rabbit'
-$dummy_event.philotic_component = 'speed_test'
+$dummy_event.philotic_firehose   = true
+$dummy_event.philotic_product    = 'rabbit'
+$dummy_event.philotic_component  = 'speed_test'
 $dummy_event.philotic_event_type = 'ping'
 
-$dummy_event.subject = "Hey"
+$dummy_event.subject   = 'Hey'
 $dummy_event.available = true
 
-$dummy_event.message_metadata = { mandatory: true }
-$dummy_event.message_metadata = { app_id: 'PHX' }
+$dummy_event.message_metadata = {mandatory: true}
+$dummy_event.message_metadata = {app_id: 'PHX'}
 
 def send_message number
-  $dummy_event.gender = [:F, :M].sample
+  $dummy_event.gender  = [:F, :M].sample
   $dummy_event.message = "Message #{number}: Hey #{$dummy_event.gender == :M ? 'dude' : 'dudette'}"
 
   $dummy_event.publish
@@ -35,7 +35,7 @@ def send_message number
 end
 
 start = Time.now
-i = 1
+i     = 1
 loop do
   send_message i
   print "Message rate: #{(i/(Time.now - start)).round(2)}/sec          \r"

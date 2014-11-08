@@ -7,9 +7,9 @@ class TestEvent < TestEventParent
 end
 
 describe Philotic::Event do
-  let(:event){ TestEvent.new }
+  let(:event) { TestEvent.new }
   subject { event }
-  
+
   Philotic::Routable::ClassMethods.instance_methods.sort.each do |method_name|
     specify { expect(subject.class.methods).to include method_name.to_sym }
   end

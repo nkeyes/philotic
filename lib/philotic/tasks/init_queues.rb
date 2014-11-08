@@ -9,7 +9,7 @@ namespace :philotic do
     require 'philotic'
 
     @filename = args[:filename]
-    queues = YAML.load_file(@filename)
+    queues    = YAML.load_file(@filename)
     Philotic.connect!
     queues.each_pair do |queue_name, queue_options|
       Philotic.initialize_named_queue!(queue_name, queue_options)

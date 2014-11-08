@@ -1,4 +1,6 @@
+require 'philotic/constants'
 require 'philotic/connection'
+require 'philotic/routable'
 
 module Philotic
   class Event
@@ -53,8 +55,8 @@ module Philotic
     end
 
     def initialize(routables={}, payloads=nil)
-      payloads ||= {}
-      self.timestamp = Time.now.to_i
+      payloads               ||= {}
+      self.timestamp         = Time.now.to_i
       self.philotic_firehose = true
 
       # dynamically insert any passed in routables into both attr_routable

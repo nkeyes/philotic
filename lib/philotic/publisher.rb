@@ -35,7 +35,7 @@ module Philotic
       Philotic::MESSAGE_OPTIONS.each do |key|
         publish_defaults[key] = config.send(key.to_s)
       end
-      message_metadata = publish_defaults.merge message_metadata
+      message_metadata           = publish_defaults.merge message_metadata
       message_metadata[:headers] ||= {}
       message_metadata[:headers] = {philotic_firehose: true}.merge(message_metadata[:headers])
 

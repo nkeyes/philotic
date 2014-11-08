@@ -37,13 +37,13 @@ module Philotic
     bindings = config[:bindings]
 
     queue_exchange = config[:exchange] ? Philotic::Connection.channel.headers(config[:exchange], durable: true) : exchange
-    queue_options = DEFAULT_NAMED_QUEUE_OPTIONS.dup
+    queue_options  = DEFAULT_NAMED_QUEUE_OPTIONS.dup
     queue_options.merge!(config[:options] || {})
 
     q = Philotic::Connection.channel.queue(queue_name, queue_options)
     Philotic.logger.info "Created queue. queue:#{q.name}"
     bindings.each do |arguments|
-      q.bind(queue_exchange, { arguments: arguments })
+      q.bind(queue_exchange, {arguments: arguments})
       Philotic.logger.info "Added binding to queue. queue:#{q.name} binding:#{arguments}"
     end
 
