@@ -16,7 +16,7 @@ Gem::Specification.new do |gem|
   gem.version = Philotic::VERSION
   gem.licenses = ['MIT']
 
-  gem.add_development_dependency 'bundler', '~> 1.6'
+  gem.add_development_dependency 'bundler', '~> 1.7'
   gem.add_development_dependency 'evented-spec', '~> 0.9'
   gem.add_development_dependency 'pry', '~> 0.10'
   gem.add_development_dependency 'rake', '~> 10.3'
