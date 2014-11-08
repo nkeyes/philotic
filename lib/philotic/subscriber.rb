@@ -26,7 +26,14 @@ module Philotic
           end
         end
       end
+    end
 
+    def self.acknowledge(message, up_to_and_including=false)
+      Philotic::Connection.channel.acknowledge(message[:delivery_info].delivery_tag, up_to_and_including)
+    end
+
+    def self.reject(message, requeue=true)
+      Philotic::Connection.channel.reject(message[:delivery_info].delivery_tag, requeue)
     end
 
     def self.subscribe_to_any_or_all_of(any_or_all, options = {})
