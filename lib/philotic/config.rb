@@ -2,6 +2,8 @@ require 'yaml'
 require 'json'
 require 'singleton'
 require 'forwardable'
+require 'cgi'
+require 'bunny/session'
 
 module Philotic
   module Config
@@ -15,7 +17,8 @@ module Philotic
     DEFAULT_RABBIT_PORT               = 5672
     DEFAULT_RABBIT_USER               = 'guest'
     DEFAULT_RABBIT_PASSWORD           = 'guest'
-    DEFAULT_RABBIT_VHOST              = '/'
+    DEFAULT_RABBIT_VHOST              = '%2f' # '/'
+    DEFAULT_RABBIT_URL                = "amqp://#{DEFAULT_RABBIT_USER}:#{DEFAULT_RABBIT_PASSWORD}@#{DEFAULT_RABBIT_HOST}:#{DEFAULT_RABBIT_PORT}/#{DEFAULT_RABBIT_VHOST}"
     DEFAULT_EXCHANGE_NAME             = 'philotic.headers'
     DEFAULT_CONNECTION_FAILED_HANDLER = lambda { |settings| Philotic.logger.error "RabbitMQ connection failure; host:#{rabbit_host}" }
     DEFAULT_CONNECTION_LOSS_HANDLER   = lambda { |conn, settings| Philotic.logger.warn "RabbitMQ connection loss; host:#{rabbit_host}"; conn.reconnect(false, 2) }
@@ -59,6 +62,27 @@ module Philotic
           end
         }
       end
+    end
+
+    def self.parse_rabbit_uri
+      settings = Bunny::Session.parse_uri(defaults[:rabbit_url])
+      settings[:password] = settings.delete(:pass)
+
+      %w[host port user password vhost].each do |setting|
+        setting = setting.to_sym
+        current_value = send("rabbit_#{setting}")
+
+        # only use the value from the URI if the existing value is nil or the default
+        if settings[setting] && [const_get("default_rabbit_#{setting}".upcase), nil].include?(current_value)
+          send("rabbit_#{setting}=", settings[setting])
+        end
+      end
+
+    end
+
+    def self.rabbit_url
+      self.parse_rabbit_uri
+      "amqp://#{rabbit_user}:#{rabbit_password}@#{rabbit_host}:#{rabbit_port}/#{CGI.escape rabbit_vhost}"
     end
 
     def load(config)
