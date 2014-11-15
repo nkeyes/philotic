@@ -18,7 +18,7 @@ describe Philotic::Routable do
         attr_routable_reader attr_routable_readers 
         attr_routable_writers attr_routable_writer 
         attr_routable }.each do |method_name|
-      specify { subject.methods.should include method_name.to_sym }
+      specify { expect(subject.methods).to include method_name.to_sym }
     end
 
     context " and then instantiating it" do
@@ -26,16 +26,15 @@ describe Philotic::Routable do
       subject { routable_event_instance }
 
       it 'should have proper headers' do
-        subject.headers.should == {routable_attr: nil}
+        expect(subject.headers).to eq({routable_attr: nil})
       end
 
       it 'should have proper payload' do
-        subject.payload.should == {payload_attr: nil}
+        expect(subject.payload).to eq({payload_attr: nil})
       end
 
       it 'should have proper attributes' do
-        subject.attributes.should == {routable_attr: nil,
-                                      payload_attr:  nil}
+        expect(subject.attributes).to eq({routable_attr: nil, payload_attr:  nil})
       end
 
       it 'should call Philotic::Publisher.publish with subject' do
@@ -44,7 +43,7 @@ describe Philotic::Routable do
       end
 
       it 'should have empty message_metadata' do
-        subject.message_metadata.should == {}
+        expect(subject.message_metadata).to eq({})
       end
 
       context "overriding a value with message_metadata=" do

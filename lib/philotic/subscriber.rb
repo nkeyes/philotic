@@ -8,24 +8,59 @@ module Philotic
       end
     end
 
-    def self.subscribe(options = {}, subscribe_options = Philotic::DEFAULT_SUBSCRIBE_OPTIONS)
-      if block_given?
-        if Philotic.connected?
-          _subscribe(options, subscribe_options, &Proc.new)
-        else
-          Philotic.connect! do
-            _subscribe(options, subscribe_options, &Proc.new)
-          end
-        end
-      else
-        if Philotic.connected?
-          _subscribe(options, subscribe_options)
-        else
-          Philotic.connect! do
-            _subscribe(options, subscribe_options)
-          end
-        end
+    def self.subscription_callback
+      lambda do |delivery_info, metadata, payload|
+        hash_payload = JSON.parse payload
+
+        event = {
+            payload:       hash_payload,
+            headers:       metadata[:headers],
+            delivery_info: delivery_info,
+            attributes:    metadata[:headers] ? hash_payload.merge(metadata[:headers]) : hash_payload
+        }
+        yield(Metadata.new(metadata), event)
       end
+    end
+
+    def self.subscribe(subscription = {}, subscribe_options = Philotic::DEFAULT_SUBSCRIBE_OPTIONS, &block)
+      Philotic.connect!
+      @exchange = Philotic::Connection.exchange
+
+      subscription_settings = get_subscription_settings subscription, subscribe_options
+
+      q = Philotic::Connection.channel.queue(subscription_settings[:queue_name], subscription_settings[:queue_options])
+
+      q.bind(@exchange, arguments: subscription_settings[:arguments]) if subscription_settings[:arguments]
+
+      q.subscribe(subscription_settings[:subscribe_options], &subscription_callback(&block))
+
+    end
+
+    def self.get_subscription_settings(subscription, subscribe_options)
+
+      if subscription.is_a? String
+        queue_name    = subscription
+        subscription  = subscribe_options
+        queue_options = Philotic::DEFAULT_NAMED_QUEUE_OPTIONS
+
+      else
+        queue_name           = subscription[:queue_name] || ''
+        queue_options        = Philotic::DEFAULT_ANONYMOUS_QUEUE_OPTIONS
+        subscribe_options    = subscribe_options.merge(subscription[:subscribe_options]) if subscription[:subscribe_options]
+        arguments            = subscription[:arguments] || subscription
+        arguments['x-match'] ||= 'all'
+      end
+
+      queue_options.merge!(subscription[:queue_options] || {})
+
+      queue_options[:auto_delete] ||= true if queue_name == ''
+
+      {
+          queue_name:        queue_name,
+          queue_options:     queue_options,
+          arguments:         arguments,
+          subscribe_options: subscribe_options,
+      }
     end
 
     def self.acknowledge(message, up_to_and_including=false)
@@ -37,15 +72,11 @@ module Philotic
     end
 
     def self.subscribe_to_any_or_all_of(any_or_all, options = {})
-      arguments     = options[:arguments] || {}
-      queue_options = options[:queue_options] || {}
-
-      arguments['x-match'] = any_or_all
-
       if block_given?
+        arguments = options[:arguments] || {}
+
+        arguments['x-match'] = any_or_all
         self.subscribe(options, &Proc.new)
-      else
-        self.subscribe(options)
       end
     end
 
@@ -55,46 +86,6 @@ module Philotic
 
     def self.subscribe_to_all_of(options = {}, &block)
       self.subscribe_to_any_or_all_of(:all, options, &block)
-    end
-
-    private
-    def self._subscribe(options = {}, subscribe_options = Philotic::DEFAULT_SUBSCRIBE_OPTIONS)
-      @exchange = Philotic::Connection.exchange
-
-      if options.is_a? String
-        queue_name    = options
-        options       = subscribe_options
-        queue_options = Philotic::DEFAULT_NAMED_QUEUE_OPTIONS
-
-      else
-        queue_name           = options[:queue_name] || ''
-        queue_options        = Philotic::DEFAULT_ANONYMOUS_QUEUE_OPTIONS
-        subscribe_options    = subscribe_options.merge(options[:subscribe_options]) if options[:subscribe_options]
-        arguments            = options[:arguments] || options
-        arguments['x-match'] ||= 'all'
-      end
-
-      queue_options.merge!(options[:queue_options] || {})
-
-      queue_options[:auto_delete] ||= true if queue_name == ''
-
-      callback = lambda do |delivery_info, metadata, payload|
-        hash_payload = JSON.parse payload
-
-        event = {
-            payload:       hash_payload,
-            headers:       metadata[:headers],
-            delivery_info: delivery_info,
-            attributes:    metadata[:headers] ? hash_payload.merge(metadata[:headers]) : hash_payload
-        }
-        Proc.new.call(Metadata.new(metadata), event)
-      end
-      q        = Philotic::Connection.channel.queue(queue_name, queue_options)
-
-      q.bind(@exchange, arguments: arguments) if arguments
-
-      q.subscribe(subscribe_options, &callback)
-
     end
   end
 end
