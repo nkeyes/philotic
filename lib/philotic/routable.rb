@@ -72,7 +72,7 @@ module Philotic
     end
 
     def headers
-      _payload_or_headers(:headers)
+      _payload_or_headers(:routable)
     end
 
     def attributes
@@ -96,7 +96,7 @@ module Philotic
 
     def _payload_or_headers(payload_or_headers)
       attribute_hash = {}
-      self.class.send(payload_or_headers).each do |attr|
+      self.class.send("attr_#{payload_or_headers}_readers").each do |attr|
         attr                 = attr.to_sym
         attribute_hash[attr] = send(attr)
       end

@@ -38,20 +38,24 @@ module Philotic
         if self.respond_to?(:"#{key}=")
           send(:"#{key}=", value)
         elsif self.class == Philotic::Event
-          self.class.send("attr_#{type}_readers").concat([key])
-          self.class.send("attr_#{type}_writers").concat([:"#{key}="])
-
-          setter = lambda do |v|
-            instance_variable_set(:"@#{key}", v)
-          end
-          getter = lambda do
-            instance_variable_get(:"@#{key}")
-          end
-          self.class.send :define_method, :"#{key}=", setter
-          self.send(:"#{key}=", value)
-          self.class.send :define_method, :"#{key}", getter
+          set_philotic_event_attribute(type, key, value)
         end
       end
+    end
+
+    def set_philotic_event_attribute(type, key, value)
+      self.class.send("attr_#{type}_readers").concat([key])
+      self.class.send("attr_#{type}_writers").concat([:"#{key}="])
+
+      setter = lambda do |v|
+        instance_variable_set(:"@#{key}", v)
+      end
+      getter = lambda do
+        instance_variable_get(:"@#{key}")
+      end
+      self.class.send :define_method, :"#{key}=", setter
+      self.send(:"#{key}=", value)
+      self.class.send :define_method, :"#{key}", getter
     end
 
     def initialize(routables={}, payloads=nil)
