@@ -11,46 +11,6 @@ module Philotic
       base.extend ClassMethods
     end
 
-    def payload
-      attribute_hash = {}
-      self.class.attr_payload_readers.each do |attr|
-        attr                 = attr.to_sym
-        attribute_hash[attr] = send(attr)
-      end
-      attribute_hash
-    end
-
-    def headers
-      attribute_hash = {}
-      self.class.attr_routable_readers.each do |attr|
-        attr                 = attr.to_sym
-        attribute_hash[attr] = send(attr)
-      end
-      attribute_hash
-    end
-
-    def attributes
-      attribute_hash = {}
-      (self.class.attr_payload_readers + self.class.attr_routable_readers).each do |attr|
-        attr                 = attr.to_sym
-        attribute_hash[attr] = send(attr)
-      end
-      attribute_hash
-    end
-
-    def message_metadata
-      @message_metadata ||= {}
-    end
-
-    def message_metadata= options
-      @message_metadata ||= {}
-      @message_metadata.merge! options
-    end
-
-    def publish &block
-      Philotic::Publisher.publish(self, &block)
-    end
-
     module ClassMethods
       def attr_payload_reader *names
         attr_payload_readers.concat(names)
@@ -105,6 +65,42 @@ module Philotic
       def publish(*args, &block)
         self.new(*args).publish(&block)
       end
+    end
+
+    def payload
+      _payload_or_headers(:payload)
+    end
+
+    def headers
+      _payload_or_headers(:headers)
+    end
+
+    def attributes
+      payload.merge headers
+    end
+
+    def message_metadata
+      @message_metadata ||= {}
+    end
+
+    def message_metadata= options
+      @message_metadata ||= {}
+      @message_metadata.merge! options
+    end
+
+    def publish &block
+      Philotic::Publisher.publish(self, &block)
+    end
+
+    private
+
+    def _payload_or_headers(payload_or_headers)
+      attribute_hash = {}
+      self.class.send(payload_or_headers).each do |attr|
+        attr                 = attr.to_sym
+        attribute_hash[attr] = send(attr)
+      end
+      attribute_hash
     end
   end
 end
