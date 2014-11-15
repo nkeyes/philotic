@@ -3,8 +3,8 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), 'support'))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), 'config'))
 
-
-require 'rubygems'
+require 'simplecov'
+SimpleCov.start
 require 'bundler/setup'
 require 'rspec/its'
 require 'philotic'
