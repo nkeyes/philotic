@@ -34,21 +34,34 @@ module Philotic
       Philotic.logger.info "deleted old queue. queue:#{queue_name}"
     end
 
-    bindings = config[:bindings]
+    queue = queue_from_config(queue_name, config)
 
-    queue_exchange = config[:exchange] ? Philotic::Connection.channel.headers(config[:exchange], durable: true) : exchange
-    queue_options  = DEFAULT_NAMED_QUEUE_OPTIONS.dup
-    queue_options.merge!(config[:options] || {})
+    bind_queue(queue, config)
+    block.call(queue) if block
+  end
 
-    q = Philotic::Connection.channel.queue(queue_name, queue_options)
-    Philotic.logger.info "Created queue. queue:#{q.name}"
+  def self.bind_queue(queue, config)
+    queue_exchange = exchange_from_config(config)
+    bindings       = config[:bindings]
     bindings.each do |arguments|
-      q.bind(queue_exchange, {arguments: arguments})
-      Philotic.logger.info "Added binding to queue. queue:#{q.name} binding:#{arguments}"
+      queue.bind(queue_exchange, {arguments: arguments})
+      Philotic.logger.info "Added binding to queue. queue:#{queue.name} binding:#{arguments}"
     end
 
-    Philotic.logger.info "Finished adding bindings to queue. queue:#{q.name}"
-    block.call(q) if block
+    Philotic.logger.info "Finished adding bindings to queue. queue:#{queue.name}"
+  end
+
+  def self.exchange_from_config(config)
+    config[:exchange] ? Philotic::Connection.channel.headers(config[:exchange], durable: true) : exchange
+  end
+
+  def self.queue_from_config(queue_name, config)
+    queue_options = DEFAULT_NAMED_QUEUE_OPTIONS.dup
+    queue_options.merge!(config[:options] || {})
+
+    Philotic::Connection.channel.queue(queue_name, queue_options).tap do
+      Philotic.logger.info "Created queue. queue:#{queue_name}"
+    end
   end
 
   def self.logger
