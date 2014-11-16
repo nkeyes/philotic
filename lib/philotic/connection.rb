@@ -63,7 +63,7 @@ module Philotic
 
     def set_exchange_return_handler!
       exchange.on_return do |basic_return, metadata, payload|
-        config.method(:message_return_handler).call.call(basic_return, metadata, payload)
+        config.message_return_handler.call(basic_return, metadata, payload)
       end
     end
   end

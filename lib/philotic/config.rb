@@ -13,18 +13,14 @@ module Philotic
 
     DEFAULT_DISABLE_PUBLISH = false
 
-    DEFAULT_RABBIT_HOST               = 'localhost'
-    DEFAULT_RABBIT_PORT               = 5672
-    DEFAULT_RABBIT_USER               = 'guest'
-    DEFAULT_RABBIT_PASSWORD           = 'guest'
-    DEFAULT_RABBIT_VHOST              = '%2f' # '/'
-    DEFAULT_RABBIT_URL                = "amqp://#{DEFAULT_RABBIT_USER}:#{DEFAULT_RABBIT_PASSWORD}@#{DEFAULT_RABBIT_HOST}:#{DEFAULT_RABBIT_PORT}/#{DEFAULT_RABBIT_VHOST}"
-    DEFAULT_EXCHANGE_NAME             = 'philotic.headers'
-    DEFAULT_CONNECTION_FAILED_HANDLER = lambda { |settings| Philotic.logger.error "RabbitMQ connection failure; host:#{rabbit_host}" }
-    DEFAULT_CONNECTION_LOSS_HANDLER   = lambda { |conn, settings| Philotic.logger.warn "RabbitMQ connection loss; host:#{rabbit_host}"; conn.reconnect(false, 2) }
-    DEFAULT_MESSAGE_RETURN_HANDLER    = lambda { |basic_return, metadata, payload| Philotic.logger.warn "Philotic message #{JSON.parse payload} was returned! reply_code = #{basic_return.reply_code}, reply_text = #{basic_return.reply_text} headers = #{metadata.properties}"; }
-    DEFAULT_TIMEOUT                   = 2
-
+    DEFAULT_RABBIT_HOST      = 'localhost'
+    DEFAULT_RABBIT_PORT      = 5672
+    DEFAULT_RABBIT_USER      = 'guest'
+    DEFAULT_RABBIT_PASSWORD  = 'guest'
+    DEFAULT_RABBIT_VHOST     = '%2f' # '/'
+    DEFAULT_RABBIT_URL       = "amqp://#{DEFAULT_RABBIT_USER}:#{DEFAULT_RABBIT_PASSWORD}@#{DEFAULT_RABBIT_HOST}:#{DEFAULT_RABBIT_PORT}/#{DEFAULT_RABBIT_VHOST}"
+    DEFAULT_EXCHANGE_NAME    = 'philotic.headers'
+    DEFAULT_TIMEOUT = 2
     DEFAULT_ROUTING_KEY      = nil
     DEFAULT_PERSISTENT       = true
     # DEFAULT_IMMEDIATE = false
@@ -64,12 +60,32 @@ module Philotic
       end
     end
 
+    attr_reader :connection_failed_handler, :connection_loss_handler, :message_return_handler
+
+    def connection_failed_handler
+      @connection_failed_handler ||= lambda do |settings|
+        Philotic.logger.error "RabbitMQ connection failure; host:#{rabbit_host}"
+      end
+    end
+
+    def connection_loss_handler
+      @connection_loss_handler ||= lambda do |conn, settings|
+        Philotic.logger.warn "RabbitMQ connection loss; host:#{rabbit_host}"; conn.reconnect(false, 2)
+      end
+    end
+
+    def message_return_handler
+      @message_return_handler ||= lambda do |basic_return, metadata, payload|
+        puts "Philotic message #{JSON.parse payload} was returned! reply_code = #{basic_return.reply_code}, reply_text = #{basic_return.reply_text} headers = #{metadata[:headers]}"
+      end
+    end
+
     def self.parse_rabbit_uri
-      settings = Bunny::Session.parse_uri(defaults[:rabbit_url])
+      settings            = Bunny::Session.parse_uri(defaults[:rabbit_url])
       settings[:password] = settings.delete(:pass)
 
       %w[host port user password vhost].each do |setting|
-        setting = setting.to_sym
+        setting       = setting.to_sym
         current_value = send("rabbit_#{setting}")
 
         # only use the value from the URI if the existing value is nil or the default
