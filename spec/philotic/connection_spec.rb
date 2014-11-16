@@ -6,25 +6,49 @@ describe Philotic::Connection do
     its(:config) { should eq Philotic::Config }
   end
 
-  describe '.connection' do
-  end
-
   describe '.connect!' do
+    context 'not connected' do
+      context 'success' do
+        specify do
+          expect(subject).to receive(:connected?).and_return(false, true)
+          expect(subject).to receive(:start_connection!)
+          expect(subject).to receive(:set_exchange_return_handler!)
+          expect(Philotic.logger).to receive(:info)
+
+          subject.connect!
+
+        end
+      end
+
+      context 'failure' do
+        specify do
+          expect(subject).to receive(:connected?).and_return(false, false)
+          expect(subject).to receive(:start_connection!)
+          expect(subject).not_to receive(:set_exchange_return_handler!)
+          expect(Philotic.logger).to receive(:error)
+
+          subject.connect!
+
+        end
+      end
+    end
+
+    context 'not connected' do
+      context 'success' do
+        specify do
+          expect(subject).to receive(:connected?).and_return(true)
+          expect(subject).not_to receive(:start_connection!)
+          expect(subject).not_to receive(:set_exchange_return_handler!)
+          expect(Philotic.logger).to receive(:info)
+
+          subject.connect!
+
+        end
+      end
+    end
   end
 
-  describe '.close' do
-  end
+  describe '.start_connection!' do
 
-  describe '.connected?' do
   end
-
-  describe '.channel' do
-  end
-
-  describe '.exchange' do
-  end
-
-  describe '.setup_exchange_handler!' do
-  end
-
 end

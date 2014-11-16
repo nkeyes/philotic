@@ -4,7 +4,13 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), 'support'))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), 'config'))
 
 require 'simplecov'
-SimpleCov.start
+require 'codeclimate-test-reporter'
+SimpleCov.start do
+  formatter SimpleCov::Formatter::MultiFormatter[
+                SimpleCov::Formatter::HTMLFormatter,
+                CodeClimate::TestReporter::Formatter
+            ]
+end
 require 'bundler/setup'
 require 'rspec/its'
 require 'philotic'

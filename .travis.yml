@@ -8,3 +8,7 @@ rvm:
   - jruby-head
 script:
   - bundle exec rspec
+addons:
+  code_climate:
+    repo_token:
+      secure: "D1HT1RpA+t8nZbXXD26rAyU8YJmaVFQXv+2yXmBmIca7d38zWz+SnJS8shtUXL48MRF31LC6ywTHjHi0JmCLKnwPQhddD8u8pecLGSOhc/wmdauDBTSlfYHo/2uErkVBix9oAgRvn/9b5sx7/yzq1PUWuhYgJhcnibECtQQQQkw="

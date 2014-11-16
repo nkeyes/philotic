@@ -26,7 +26,7 @@ module Philotic
         set_exchange_return_handler!
         true
       else
-        Philotic.logger.warn "failed connected to RabbitMQ; host:#{config.rabbit_host}"
+        Philotic.logger.error "failed connected to RabbitMQ; host:#{config.rabbit_host}"
         false
       end
     end
