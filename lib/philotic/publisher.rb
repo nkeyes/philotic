@@ -17,6 +17,31 @@ module Philotic
     private
     def _publish(payload, message_metadata = {})
       Philotic.connect!
+      unless Philotic::Connection.connected?
+        Philotic.log_event_published(:error, message_metadata, payload, 'unable to publish event, not connected to RabbitMQ')
+        return
+      end
+      message_metadata = merge_metadata(message_metadata)
+
+      payload = normalize_payload_times(payload)
+
+      return if config.disable_publish
+
+      Philotic::Connection.exchange.publish(payload.to_json, message_metadata)
+      Philotic.log_event_published(:debug, message_metadata, payload, 'published event')
+    end
+
+    def normalize_payload_times(payload)
+      payload.each do |k, v|
+        if v.respond_to?(:utc)
+          payload[k] = v.utc
+        elsif v.respond_to?(:to_utc)
+          payload[k] = v.to_utc
+        end
+      end
+    end
+
+    def merge_metadata(message_metadata)
       publish_defaults = {}
       Philotic::MESSAGE_OPTIONS.each do |key|
         publish_defaults[key] = config.send(key.to_s)
@@ -24,17 +49,7 @@ module Philotic
       message_metadata           = publish_defaults.merge message_metadata
       message_metadata[:headers] ||= {}
       message_metadata[:headers] = {philotic_firehose: true}.merge(message_metadata[:headers])
-
-      payload.each { |k, v| payload[k] = v.utc if v.is_a? ActiveSupport::TimeWithZone }
-
-      return if config.disable_publish
-
-      unless Philotic::Connection.connected?
-        Philotic.log_event_published(:error, message_metadata, payload, 'unable to publish event, not connected to amqp broker')
-        return
-      end
-      Philotic::Connection.exchange.publish(payload.to_json, message_metadata)
-      Philotic.log_event_published(:debug, message_metadata, payload, 'published event')
+      message_metadata
     end
   end
 end
