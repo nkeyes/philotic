@@ -66,4 +66,18 @@ describe Philotic::Subscriber do
       end
     end
   end
+
+  describe '.subscribe_to_any' do
+    let(:headers) do
+      {
+          header1: 'h1',
+          header2: 'h2',
+          header3: 'h3',
+      }
+    end
+    specify do
+      expect(Philotic::Subscriber).to receive(:subscribe).with(headers.merge(:'x-match' => :any))
+      Philotic::Subscriber.subscribe_to_any(headers) {}
+    end
+  end
 end

@@ -49,6 +49,12 @@ describe Philotic::Connection do
   end
 
   describe '.start_connection!' do
+    let(:connection) { double }
+    specify do
+      expect(Bunny).to receive(:new).with(Philotic::Config.rabbit_url, Philotic::Connection.connection_settings).and_return(connection)
+      expect(connection).to receive(:start)
 
+      Philotic::Connection.start_connection!
+    end
   end
 end

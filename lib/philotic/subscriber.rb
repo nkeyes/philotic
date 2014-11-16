@@ -71,21 +71,10 @@ module Philotic
       Philotic::Connection.channel.reject(message[:delivery_info].delivery_tag, requeue)
     end
 
-    def self.subscribe_to_any_or_all_of(any_or_all, options = {})
+    def self.subscribe_to_any(options = {})
       if block_given?
-        arguments = options[:arguments] || {}
-
-        arguments['x-match'] = any_or_all
-        self.subscribe(options, &Proc.new)
+        self.subscribe(options.merge(:'x-match' => :any), &Proc.new)
       end
-    end
-
-    def self.subscribe_to_any_of(options = {}, &block)
-      self.subscribe_to_any_or_all_of(:any, options, &block)
-    end
-
-    def self.subscribe_to_all_of(options = {}, &block)
-      self.subscribe_to_any_or_all_of(:all, options, &block)
     end
   end
 end

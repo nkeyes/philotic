@@ -41,4 +41,29 @@ describe Philotic::Event do
       expect(subject.headers.keys).to include :philotic_product
     end
   end
+  
+  context 'generic event' do
+    let(:headers) do
+      {
+          header1: 'h1',
+          header2: 'h2',
+          header3: 'h3',
+      }
+    end
+
+    let(:payloads) do
+      {
+          payload1: 'h1',
+          payload2: 'h2',
+          payload3: 'h3',
+      }
+    end
+    it 'builds an event with dynamic headers and payloads' do
+      event = Philotic::Event.new(headers, payloads)
+
+      expect(event.headers).to include(headers)
+      expect(event.payload).to eq payloads
+
+    end
+  end
 end

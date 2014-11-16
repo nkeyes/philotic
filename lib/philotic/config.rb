@@ -81,7 +81,7 @@ module Philotic
     end
 
     def self.parse_rabbit_uri
-      settings            = Bunny::Session.parse_uri(defaults[:rabbit_url])
+      settings            = Bunny::Session.parse_uri(@rabbit_url)
       settings[:password] = settings.delete(:pass)
 
       %w[host port user password vhost].each do |setting|
