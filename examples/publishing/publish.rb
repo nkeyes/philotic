@@ -5,12 +5,7 @@ $stdout.sync = true
 require 'philotic'
 require 'philotic/dummy_event'
 
-Philotic.logger= Logger.new('/dev/null')
-
-Philotic::Config.load_file(File.join(File.dirname(__FILE__), "../../", "philotic.yml.example"))
-
-#Philotic::Config.threaded_publish = true
-#Philotic::Config.threaded_publish_pool_size = 3
+Philotic.logger = Logger.new('/dev/null')
 
 Philotic::Connection.connect!
 @event = Philotic::DummyEvent.new
