@@ -1,12 +1,8 @@
-require 'awesome_print'
 require 'active_support/all'
-
 require 'pathname'
-
 require 'logger'
 
 require 'philotic/constants'
-
 
 module Philotic
   mattr_accessor :logger
@@ -24,20 +20,21 @@ module Philotic
     Philotic::Connection.exchange
   end
 
-  def self.initialize_named_queue!(queue_name, config, &block)
+  def self.initialize_named_queue!(queue_name, config)
+    Philotic.connect!
     config = config.deep_symbolize_keys
 
     raise "ENV['INITIALIZE_NAMED_QUEUE'] must equal 'true' to run Philotic.initialize_named_queue!" unless ENV['INITIALIZE_NAMED_QUEUE'] == 'true'
 
     if Philotic::Connection.connection.queue_exists? queue_name
       Philotic::Connection.channel.queue(queue_name, passive: true).delete
-      Philotic.logger.info "deleted old queue. queue:#{queue_name}"
+      Philotic.logger.info "deleted old queue. queue: #{queue_name}"
     end
 
     queue = queue_from_config(queue_name, config)
 
     bind_queue(queue, config)
-    block.call(queue) if block
+    yield queue if block_given?
   end
 
   def self.bind_queue(queue, config)
@@ -45,10 +42,10 @@ module Philotic
     bindings       = config[:bindings]
     bindings.each do |arguments|
       queue.bind(queue_exchange, {arguments: arguments})
-      Philotic.logger.info "Added binding to queue. queue:#{queue.name} binding:#{arguments}"
+      Philotic.logger.info "Added binding to queue. queue: #{queue.name} binding: #{arguments}"
     end
 
-    Philotic.logger.info "Finished adding bindings to queue. queue:#{queue.name}"
+    Philotic.logger.info "Finished adding bindings to queue. queue: #{queue.name}"
   end
 
   def self.exchange_from_config(config)

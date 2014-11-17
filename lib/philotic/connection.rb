@@ -14,15 +14,12 @@ module Philotic
     end
 
     def connect!
-      if connected?
-        Philotic.logger.info "already connected to RabbitMQ; host:#{config.rabbit_host}"
-        return
-      end
+      return if connected?
 
       start_connection!
 
       if connected?
-        Philotic.logger.info "connected to RabbitMQ; host:#{config.rabbit_host}"
+        Philotic.logger.info "connected to RabbitMQ: #{config.rabbit_host}:#{config.rabbit_port}"
         set_exchange_return_handler!
         true
       else
