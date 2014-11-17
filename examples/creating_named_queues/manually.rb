@@ -4,23 +4,10 @@ $stdout.sync = true
 
 require 'philotic'
 
-EventMachine.run do
-# hit Control + C to stop
-  Signal.trap("INT") { EventMachine.stop }
-  Signal.trap("TERM") { EventMachine.stop }
-
-  queue_after_initialize_handler = lambda do |q|
-    Philotic.logger.info "Queue '#{q.name}' initialized: #{q.bindings}"
-  end
-  # consume ansible + subspace + new_message events
-  ansible_arguments              = {
-      "x-match"            => :all,
-      philotic_product:    :ansible,
-      philotic_component:  :subspace,
-      philotic_event_type: :new_message,
-  }
-  Philotic.initialize_named_queue!('ansible.new_messages', ansible_arguments, &queue_after_initialize_handler)
-
-
-  EM.add_timer(5) { EM.stop }
-end
+# explicitly create named queues for this example
+# ENV['INITIALIZE_NAMED_QUEUE'] must equal 'true' to run Philotic.initialize_named_queue!
+ENV['INITIALIZE_NAMED_QUEUE'] = 'true'
+Philotic.initialize_named_queue!('male_queue', bindings: [{:'x-match' => 'all', gender: :M, available: true}])
+Philotic.initialize_named_queue!('female_queue', bindings: [{:'x-match' => 'all', gender: :F, available: true}])
+Philotic.initialize_named_queue!('test_queue', bindings: [{ :'x-match' => 'any', gender: :M, available: true }])
+Philotic.initialize_named_queue!('flaky_queue', bindings: [{ :'x-match' => 'any', gender: :M, available: true }])

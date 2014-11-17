@@ -3,17 +3,13 @@ $:.unshift File.expand_path('../../../lib', __FILE__)
 $stdout.sync = true
 
 require 'philotic'
+require 'awesome_print'
 
-EventMachine.run do
-# hit Control + C to stop
-#  Signal.trap("INT")  { EventMachine.stop }
-#  Signal.trap("TERM") { EventMachine.stop }
-
-  Philotic::Config.load_file(File.join(File.dirname(__FILE__), "../../", "philotic.yml"))
+Philotic::Config.load_file(File.join(File.dirname(__FILE__), '../../', 'philotic.yml.example'))
 
 
-  Philotic::Subscriber.subscribe(philotic_fire_hose: true) do |metadata, payload|
-    p metadata.attributes
-    p payload
-  end
+Philotic::Subscriber.subscribe(philotic_firehose: true) do |metadata, message|
+  ap message[:attributes]
 end
+
+Philotic::Subscriber.endure

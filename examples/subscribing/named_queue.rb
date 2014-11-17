@@ -3,22 +3,11 @@ $:.unshift File.expand_path('../../../lib', __FILE__)
 $stdout.sync = true
 
 require 'philotic'
-
-EventMachine.run do
-# hit Control + C to stop
-  Signal.trap('INT') { EventMachine.stop }
-  Signal.trap('TERM') { EventMachine.stop }
-
-  #explicitly create a named queue for this example
-  ENV['INITIALIZE_NAMED_QUEUE'] = 'true'
-  Philotic.initialize_named_queue!('test_queue', bindings: [{:'x-match' => 'any', gender: :M, available: true}])
+require 'awesome_print'
 
 
-  # give it time to actually create the queue, then subscribe
-  EM.add_timer(3) do
-    Philotic::Subscriber.subscribe('test_queue') do |metadata, payload|
-      p metadata.attributes
-      p payload
-    end
-  end
+Philotic::Subscriber.subscribe('test_queue') do |metadata, message|
+  ap message[:attributes]
 end
+
+Philotic::Subscriber.endure
