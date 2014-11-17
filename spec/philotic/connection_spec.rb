@@ -13,7 +13,6 @@ describe Philotic::Connection do
           expect(subject).to receive(:connected?).and_return(false, true)
           expect(subject).to receive(:start_connection!)
           expect(subject).to receive(:set_exchange_return_handler!)
-          expect(Philotic.logger).to receive(:info)
 
           subject.connect!
 
@@ -39,7 +38,6 @@ describe Philotic::Connection do
           expect(subject).to receive(:connected?).and_return(true)
           expect(subject).not_to receive(:start_connection!)
           expect(subject).not_to receive(:set_exchange_return_handler!)
-          expect(Philotic.logger).to receive(:info)
 
           subject.connect!
 
