@@ -76,5 +76,11 @@ module Philotic
         self.subscribe(options.merge(:'x-match' => :any), &Proc.new)
       end
     end
+
+    def self.endure
+      while true
+        Thread.pass
+      end
+    end
   end
 end
