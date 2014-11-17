@@ -80,4 +80,32 @@ describe Philotic::Subscriber do
       Philotic::Subscriber.subscribe_to_any(headers) {}
     end
   end
+
+  describe '.acknowledge' do
+    let(:channel) { double }
+    let(:delivery_tag) { double }
+    let(:delivery_info) { double }
+    let(:message) { {delivery_info: delivery_info} }
+
+    specify do
+      expect(Philotic::Connection).to receive(:channel).and_return(channel)
+      expect(delivery_info).to receive(:delivery_tag).and_return(delivery_tag)
+      expect(channel).to receive(:acknowledge).with(delivery_tag, false)
+      Philotic::Subscriber.acknowledge(message)
+    end
+  end
+
+  describe '.reject' do
+    let(:channel) { double }
+    let(:delivery_tag) { double }
+    let(:delivery_info) { double }
+    let(:message) { {delivery_info: delivery_info} }
+
+    specify do
+      expect(Philotic::Connection).to receive(:channel).and_return(channel)
+      expect(delivery_info).to receive(:delivery_tag).and_return(delivery_tag)
+      expect(channel).to receive(:reject).with(delivery_tag, true)
+      Philotic::Subscriber.reject(message)
+    end
+  end
 end
