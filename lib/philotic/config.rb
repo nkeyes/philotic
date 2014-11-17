@@ -60,7 +60,7 @@ module Philotic
       end
     end
 
-    attr_reader :connection_failed_handler, :connection_loss_handler, :message_return_handler
+    attr_writer :connection_failed_handler, :connection_loss_handler, :message_return_handler
 
     def connection_failed_handler
       @connection_failed_handler ||= lambda do |settings|
