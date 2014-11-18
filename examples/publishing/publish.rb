@@ -5,9 +5,8 @@ $stdout.sync = true
 require 'philotic'
 require 'philotic/dummy_event'
 
-Philotic.logger = Logger.new('/dev/null')
+Philotic.logger.level = Logger::WARN
 
-Philotic::Connection.connect!
 @event = Philotic::DummyEvent.new
 
 @event.philotic_firehose   = true
