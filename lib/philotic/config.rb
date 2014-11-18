@@ -13,12 +13,13 @@ module Philotic
 
     DEFAULT_DISABLE_PUBLISH = false
 
+    DEFAULT_RABBIT_SCHEME     = 'amqp'
     DEFAULT_RABBIT_HOST      = 'localhost'
     DEFAULT_RABBIT_PORT      = 5672
     DEFAULT_RABBIT_USER      = 'guest'
     DEFAULT_RABBIT_PASSWORD  = 'guest'
     DEFAULT_RABBIT_VHOST     = '%2f' # '/'
-    DEFAULT_RABBIT_URL       = "amqp://#{DEFAULT_RABBIT_USER}:#{DEFAULT_RABBIT_PASSWORD}@#{DEFAULT_RABBIT_HOST}:#{DEFAULT_RABBIT_PORT}/#{DEFAULT_RABBIT_VHOST}"
+    DEFAULT_RABBIT_URL       = "#{DEFAULT_RABBIT_SCHEME}://#{DEFAULT_RABBIT_USER}:#{DEFAULT_RABBIT_PASSWORD}@#{DEFAULT_RABBIT_HOST}:#{DEFAULT_RABBIT_PORT}/#{DEFAULT_RABBIT_VHOST}"
     DEFAULT_EXCHANGE_NAME    = 'philotic.headers'
     DEFAULT_TIMEOUT = 2
     DEFAULT_ROUTING_KEY      = nil
@@ -84,7 +85,7 @@ module Philotic
       settings            = Bunny::Session.parse_uri(@rabbit_url || defaults[:rabbit_url])
       settings[:password] = settings.delete(:pass)
 
-      %w[host port user password vhost].each do |setting|
+      %w[scheme host port user password vhost].each do |setting|
         setting       = setting.to_sym
         current_value = send("rabbit_#{setting}")
 
@@ -98,7 +99,7 @@ module Philotic
 
     def self.rabbit_url
       self.parse_rabbit_uri
-      "amqp://#{rabbit_user}:#{rabbit_password}@#{rabbit_host}:#{rabbit_port}/#{CGI.escape rabbit_vhost}"
+      "#{rabbit_scheme}://#{rabbit_user}:#{rabbit_password}@#{rabbit_host}:#{rabbit_port}/#{CGI.escape rabbit_vhost}"
     end
 
     def load(config)
