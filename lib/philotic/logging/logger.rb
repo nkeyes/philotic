@@ -25,10 +25,12 @@ module Philotic
             progname = @progname
           end
         end
-        @logdev.write(
-            format_message(format_severity(severity), Time.now, progname, message))
-        event_class.publish(severity, message, progname)
-
+        @logdev.write(format_message(format_severity(severity), Time.now, progname, message))
+        begin
+          event_class.publish(severity, message, progname)
+        rescue => e
+          @logdev.write(format_message(format_severity(Logger::ERROR), Time.now, progname, e.message))
+        end
         true
       end
 
