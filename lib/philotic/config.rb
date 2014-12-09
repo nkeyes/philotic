@@ -77,7 +77,7 @@ module Philotic
 
     def message_return_handler
       @message_return_handler ||= lambda do |basic_return, metadata, payload|
-        puts "Philotic message #{JSON.parse payload} was returned! reply_code = #{basic_return.reply_code}, reply_text = #{basic_return.reply_text} headers = #{metadata[:headers]}"
+        Philotic.logger.warn "Philotic message #{JSON.parse payload} was returned! reply_code = #{basic_return.reply_code}, reply_text = #{basic_return.reply_text} headers = #{metadata[:headers]}"
       end
     end
 
