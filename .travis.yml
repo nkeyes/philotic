@@ -1,15 +1,19 @@
 language: ruby
 rvm:
-  - 1.9.3
-  - 2.0.0
-  - 2.1.0
-  - rbx-2.2.10
-  - jruby-19mode
-  - ruby-head
-  - jruby-head
+- 1.9.3
+- 2.0.0
+- 2.1.0
+- rbx-2.2.10
+- jruby-19mode
+- ruby-head
+- jruby-head
 script:
-  - bundle exec rspec
+- bundle exec rspec
 addons:
   code_climate:
     repo_token:
-      secure: "D1HT1RpA+t8nZbXXD26rAyU8YJmaVFQXv+2yXmBmIca7d38zWz+SnJS8shtUXL48MRF31LC6ywTHjHi0JmCLKnwPQhddD8u8pecLGSOhc/wmdauDBTSlfYHo/2uErkVBix9oAgRvn/9b5sx7/yzq1PUWuhYgJhcnibECtQQQQkw="
+      secure: D1HT1RpA+t8nZbXXD26rAyU8YJmaVFQXv+2yXmBmIca7d38zWz+SnJS8shtUXL48MRF31LC6ywTHjHi0JmCLKnwPQhddD8u8pecLGSOhc/wmdauDBTSlfYHo/2uErkVBix9oAgRvn/9b5sx7/yzq1PUWuhYgJhcnibECtQQQQkw=
+notifications:
+  hipchat:
+    rooms:
+      secure: akLY832/pt0+9Y2TFKpzW08bagPMY//AcQJ5JGzc0yd3hZbXTlkW4S8bMEclBeHBqLGCV6vaWeN90PiYwIBs4IWlxopPAop4BEWeqRvD8+B4fxarXYwejt54vH3v4iCnHhSNBpFJDbykyfL0f0g9fhvM48eHzhBXTxPZfpQ9nXs=
