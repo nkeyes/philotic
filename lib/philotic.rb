@@ -24,16 +24,23 @@ module Philotic
     raise "ENV['PHILOTIC_INITIALIZE_NAMED_QUEUE'] must equal 'true' to run Philotic.initialize_named_queue!" unless ENV['PHILOTIC_INITIALIZE_NAMED_QUEUE'] == 'true'
 
     Philotic.connect!
+    queue_exists = Philotic::Connection.connection.queue_exists? queue_name
 
-    if Philotic::Connection.connection.queue_exists? queue_name
+    should_delete_queue = queue_exists && ENV['PHILOTIC_DELETE_EXISTING_QUEUE'] == 'true'
+    should_create_queue = !queue_exists || ENV['PHILOTIC_DELETE_EXISTING_QUEUE'] == 'true'
+
+    if should_delete_queue
       Philotic::Connection.channel.queue(queue_name, passive: true).delete
       Philotic.logger.info "deleted old queue. queue: #{queue_name}"
     end
 
-    config = config.deep_symbolize_keys
-
-    queue = queue_from_config(queue_name, config)
-    bind_queue(queue, config)
+    if should_create_queue
+      config = config.deep_symbolize_keys
+      queue = queue_from_config(queue_name, config)
+      bind_queue(queue, config)
+    else
+      Philotic.logger.warn "Queue #{queue_name} not created; it already exists. ENV['PHILOTIC_DELETE_EXISTING_QUEUE'] must equal 'true' to override."
+    end
   end
 
   def self.bind_queue(queue, config)
