@@ -62,8 +62,8 @@ module Philotic
         attr_accessor(*names)
       end
 
-      def publish(*args, &block)
-        self.new(*args).publish(&block)
+      def publish(*args)
+        self.new(*args).publish
       end
     end
 
@@ -88,8 +88,8 @@ module Philotic
       @message_metadata.merge! options
     end
 
-    def publish &block
-      Philotic::Publisher.publish(self, &block)
+    def publish
+      Philotic::Publisher.publish self
     end
 
     private

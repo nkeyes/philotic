@@ -11,7 +11,7 @@ module Philotic
         @event_class ||= Philotic::Logging::Event
       end
 
-      def add(severity, message = nil, progname = nil, &block)
+      def add(severity, message = nil, progname = nil)
         severity ||= UNKNOWN
         if @logdev.nil? or severity < @level
           return true

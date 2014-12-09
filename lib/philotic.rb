@@ -34,7 +34,6 @@ module Philotic
     queue = queue_from_config(queue_name, config)
 
     bind_queue(queue, config)
-    yield queue if block_given?
   end
 
   def self.bind_queue(queue, config)
@@ -85,8 +84,8 @@ module Philotic
     Philotic::Connection.connected?
   end
 
-  def self.connect! &block
-    Philotic::Connection.connect! &block
+  def self.connect!
+    Philotic::Connection.connect!
   end
 end
 
