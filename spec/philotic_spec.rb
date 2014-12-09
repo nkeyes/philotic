@@ -79,9 +79,5 @@ describe Philotic do
         Philotic.initialize_named_queue! queue_name, config
       end
     end
-
-    it 'should set up the queue with the right parameters' do
-
-    end
   end
 end
