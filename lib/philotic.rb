@@ -21,18 +21,18 @@ module Philotic
   end
 
   def self.initialize_named_queue!(queue_name, config)
-    Philotic.connect!
-    config = config.deep_symbolize_keys
+    raise "ENV['PHILOTIC_INITIALIZE_NAMED_QUEUE'] must equal 'true' to run Philotic.initialize_named_queue!" unless ENV['PHILOTIC_INITIALIZE_NAMED_QUEUE'] == 'true'
 
-    raise "ENV['INITIALIZE_NAMED_QUEUE'] must equal 'true' to run Philotic.initialize_named_queue!" unless ENV['INITIALIZE_NAMED_QUEUE'] == 'true'
+    Philotic.connect!
 
     if Philotic::Connection.connection.queue_exists? queue_name
       Philotic::Connection.channel.queue(queue_name, passive: true).delete
       Philotic.logger.info "deleted old queue. queue: #{queue_name}"
     end
 
-    queue = queue_from_config(queue_name, config)
+    config = config.deep_symbolize_keys
 
+    queue = queue_from_config(queue_name, config)
     bind_queue(queue, config)
   end
 

@@ -24,17 +24,17 @@ describe Philotic do
           }
       }
     end
-    it "should throw an error when ENV['INITIALIZE_NAMED_QUEUE'] is not set to 'true'" do
-      ENV['INITIALIZE_NAMED_QUEUE'] = nil
-      queue_name                    = test_queues.keys.first
-      config                        = test_queues[queue_name]
-      expect(Philotic).to receive(:connect!)
-      expect { Philotic.initialize_named_queue! queue_name, config }.to raise_error("ENV['INITIALIZE_NAMED_QUEUE'] must equal 'true' to run Philotic.initialize_named_queue!")
+    it "should throw an error when ENV['PHILOTIC_INITIALIZE_NAMED_QUEUE'] is not set to 'true'" do
+      ENV['PHILOTIC_INITIALIZE_NAMED_QUEUE'] = nil
+      queue_name                             = test_queues.keys.first
+      config                                 = test_queues[queue_name]
+      expect(Philotic).not_to receive(:connect!)
+      expect { Philotic.initialize_named_queue! queue_name, config }.to raise_error("ENV['PHILOTIC_INITIALIZE_NAMED_QUEUE'] must equal 'true' to run Philotic.initialize_named_queue!")
 
     end
 
     it 'should set up the queue with the right parameters' do
-      ENV['INITIALIZE_NAMED_QUEUE'] = 'true'
+      ENV['PHILOTIC_INITIALIZE_NAMED_QUEUE'] = 'true'
 
       test_queues.each_pair do |queue_name, config|
 
