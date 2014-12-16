@@ -42,6 +42,7 @@ end
 * 2.0.0
 * 2.1.0
 * rbx-2.2.10
+* rbx-2.3.0
 * jruby-19mode
 * ruby-head
 * jruby-head
