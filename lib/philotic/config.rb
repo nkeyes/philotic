@@ -13,9 +13,9 @@ module Philotic
 
     DEFAULT_DISABLE_PUBLISH = false
 
-    DEFAULT_RABBIT_SCHEME     = 'amqp'
+    DEFAULT_RABBIT_SCHEME     = 'amqps'
     DEFAULT_RABBIT_HOST      = 'localhost'
-    DEFAULT_RABBIT_PORT      = 5672
+    DEFAULT_RABBIT_PORT      = 5671
     DEFAULT_RABBIT_USER      = 'guest'
     DEFAULT_RABBIT_PASSWORD  = 'guest'
     DEFAULT_RABBIT_VHOST     = '%2f' # '/'
