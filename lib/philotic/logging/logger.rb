@@ -6,6 +6,7 @@ module Philotic
     class Logger < ::Logger
 
       attr_writer :event_class
+      attr_accessor :connection
 
       def event_class
         @event_class ||= Philotic::Logging::Event
@@ -27,7 +28,8 @@ module Philotic
         end
         @logdev.write(format_message(format_severity(severity), Time.now, progname, message))
         begin
-          event_class.publish(severity, message, progname)
+          event = event_class.new(severity, message, progname)
+          connection.publish event if connection
         rescue => e
           @logdev.write(format_message(format_severity(Logger::ERROR), Time.now, progname, e.message))
         end

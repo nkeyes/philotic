@@ -128,5 +128,9 @@ module Philotic
     def logger
       @logger ||= Logger.new(STDOUT)
     end
+
+    def publish(event)
+      publisher.publish(event)
+    end
   end
 end

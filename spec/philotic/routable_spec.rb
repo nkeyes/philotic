@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Philotic::Routable do
-  context "including the module on class" do
+  context 'including the module on class' do
     let(:routable_event_class) {
       Class.new do
         include Philotic::Routable
@@ -21,7 +21,7 @@ describe Philotic::Routable do
       specify { expect(subject.methods).to include method_name.to_sym }
     end
 
-    context " and then instantiating it" do
+    context ' and then instantiating it' do
       let(:routable_event_instance) { routable_event_class.new }
       subject { routable_event_instance }
 
@@ -37,16 +37,11 @@ describe Philotic::Routable do
         expect(subject.attributes).to eq({routable_attr: nil, payload_attr:  nil})
       end
 
-      it 'should call Philotic::Publisher.publish with subject' do
-        expect(Philotic::Publisher).to receive(:publish).with(subject)
-        subject.publish
-      end
-
       it 'should have empty message_metadata' do
         expect(subject.message_metadata).to eq({})
       end
 
-      context "overriding a value with message_metadata=" do
+      context 'overriding a value with message_metadata=' do
         before do
           routable_event_instance.message_metadata = {mandatory: false}
         end
