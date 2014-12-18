@@ -5,17 +5,14 @@ namespace :philotic do
 
     require 'philotic'
 
-    philotic = Philotic::Connection.new
-
     # philotic.config.initialize_named_queues must be truthy to run Philotic.initialize_named_queue!
-    philotic.config.initialize_named_queues = true
+    Philotic.config.initialize_named_queues = true
 
 
     @filename = args[:filename]
     queues    = YAML.load_file(@filename)
-    philotic.connect!
     queues.each_pair do |queue_name, queue_options|
-      philotic.initialize_named_queue!(queue_name, queue_options)
+      Philotic.initialize_named_queue!(queue_name, queue_options)
     end
   end
 end
