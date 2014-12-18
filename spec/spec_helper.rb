@@ -26,6 +26,5 @@ RSpec.configure do |config|
   config.after do
     Timecop.return
   end
-
 end
 Philotic.logger = Logger.new("/dev/null")
