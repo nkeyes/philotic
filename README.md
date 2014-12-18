@@ -8,8 +8,8 @@ Lightweight, opinionated wrapper for using RabbitMQ headers exchanges
 [![Test Coverage](https://codeclimate.com/github/nkeyes/philotic/badges/coverage.svg)](https://codeclimate.com/github/nkeyes/philotic)
 
 Check out the [examples](https://github.com/nkeyes/philotic/tree/master/examples).
-
-## Simple Example, using `Philotic` as a singleton
+## Examples
+### Using `Philotic` as a singleton
 ```Ruby
 require 'philotic'
 require 'awesome_print'
@@ -36,7 +36,7 @@ loop do
 end
 ```
 
-## Simple Example, using an instance of `Philotic::Connection`
+### Using an instance of `Philotic::Connection`
 ```Ruby
 require 'philotic'
 require 'awesome_print'
