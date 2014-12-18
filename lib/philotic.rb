@@ -2,6 +2,8 @@ require 'active_support/all'
 require 'pathname'
 
 require 'philotic/constants'
+require 'philotic/connection'
+
 
 module Philotic
 
@@ -12,10 +14,13 @@ module Philotic
   def self.env
     ENV['SERVICE_ENV'] || 'development'
   end
+
+  def self.connection
+    @connection ||= Philotic::Connection.new
+  end
 end
 
 require 'philotic/version'
-require 'philotic/connection'
 require 'philotic/config'
 require 'philotic/routable'
 require 'philotic/event'
