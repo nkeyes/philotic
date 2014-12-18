@@ -40,14 +40,15 @@ module Philotic
     DEFAULT_TIMESTAMP               = nil
     DEFAULT_EXPIRATION              = nil
 
-    attr_accessor :logger
+    attr_accessor :connection
 
-    def initialize(config={})
-      load config
+    def initialize(connection, config={})
+      load_config config
+      @connection = connection
     end
 
     def logger
-      @logger ||= Logger.new(STDOUT)
+      connection.logger
     end
 
     def defaults
@@ -117,9 +118,7 @@ module Philotic
       "#{rabbit_scheme}://#{rabbit_user}:#{rabbit_password}@#{rabbit_host}:#{rabbit_port}/#{CGI.escape rabbit_vhost}"
     end
 
-    def load(config)
-      logger # ensure the logger can be created, so we crash early if it can't
-
+    def load_config(config)
       config.each do |k, v|
         mutator = "#{k}="
         send(mutator, v) if respond_to? mutator

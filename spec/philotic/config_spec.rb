@@ -1,4 +1,6 @@
 require 'spec_helper'
+require 'philotic/config'
+require 'philotic/connection'
 
 describe Philotic::Config do
 
@@ -13,7 +15,7 @@ describe Philotic::Config do
 
   describe '.parse_rabbit_uri' do
     let(:url) { 'amqp://user:pass@host:12345/vhost' }
-    let(:config) { Philotic::Config.new }
+    let(:config) { Philotic::Connection.new.config }
     before do
       config.rabbit_url = url
     end

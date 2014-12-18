@@ -22,7 +22,7 @@ module Philotic
     end
 
     def config
-      @config ||= Philotic::Config.new
+      @config ||= Philotic::Config.new self
     end
 
     def connect!
