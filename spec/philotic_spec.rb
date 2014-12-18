@@ -24,17 +24,19 @@ describe Philotic do
           }
       }
     end
-    it "should throw an error when ENV['PHILOTIC_INITIALIZE_NAMED_QUEUE'] is not set to 'true'" do
-      ENV['PHILOTIC_INITIALIZE_NAMED_QUEUE'] = nil
+    it 'should throw an error when Philotic::Config.initialize_named_queues is falsey' do
+      allow(Philotic::Config).to receive(:initialize_named_queues).and_return(nil)
       queue_name                             = test_queues.keys.first
       config                                 = test_queues[queue_name]
       expect(Philotic).not_to receive(:connect!)
-      expect { Philotic.initialize_named_queue! queue_name, config }.to raise_error("ENV['PHILOTIC_INITIALIZE_NAMED_QUEUE'] must equal 'true' to run Philotic.initialize_named_queue!")
+      expect { Philotic.initialize_named_queue! queue_name, config }.to raise_error
 
     end
 
-    it "should log a warning when ENV['PHILOTIC_DELETE_EXISTING_QUEUE'] is not set to 'true' and the queue already exists" do
-      ENV['PHILOTIC_INITIALIZE_NAMED_QUEUE'] = 'true'
+    it 'should log a warning when Philotic::Config.delete_existing_queues is falsey and the queue already exists' do
+      allow(Philotic::Config).to receive(:initialize_named_queues).and_return(true)
+      allow(Philotic::Config).to receive(:delete_existing_queues).and_return(nil)
+
       test_queues.each_pair do |queue_name, config|
 
         connection = double
@@ -49,9 +51,9 @@ describe Philotic do
       end
     end
 
-    it "should delete the queue first when ENV['PHILOTIC_DELETE_EXISTING_QUEUE'] is set to 'true' and the queue already exists" do
-      ENV['PHILOTIC_INITIALIZE_NAMED_QUEUE'] = 'true'
-      ENV['PHILOTIC_DELETE_EXISTING_QUEUE'] = 'true'
+    it 'should delete the queue first when Philotic::Config.delete_existing_queues is truthy and the queue already exists' do
+      allow(Philotic::Config).to receive(:initialize_named_queues).and_return(true)
+      allow(Philotic::Config).to receive(:delete_existing_queues).and_return(true)
 
       test_queues.each_pair do |queue_name, config|
 

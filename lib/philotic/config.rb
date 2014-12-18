@@ -11,41 +11,42 @@ module Philotic
 
     ENV_PREFIX = 'PHILOTIC'
 
-    DEFAULT_DISABLE_PUBLISH = false
-
-    DEFAULT_RABBIT_SCHEME     = 'amqps'
-    DEFAULT_RABBIT_HOST      = 'localhost'
-    DEFAULT_RABBIT_PORT      = 5671
-    DEFAULT_RABBIT_USER      = 'guest'
-    DEFAULT_RABBIT_PASSWORD  = 'guest'
-    DEFAULT_RABBIT_VHOST     = '%2f' # '/'
-    DEFAULT_RABBIT_URL       = "#{DEFAULT_RABBIT_SCHEME}://#{DEFAULT_RABBIT_USER}:#{DEFAULT_RABBIT_PASSWORD}@#{DEFAULT_RABBIT_HOST}:#{DEFAULT_RABBIT_PORT}/#{DEFAULT_RABBIT_VHOST}"
-    DEFAULT_EXCHANGE_NAME    = 'philotic.headers'
-    DEFAULT_TIMEOUT = 2
-    DEFAULT_ROUTING_KEY      = nil
-    DEFAULT_PERSISTENT       = true
+    DEFAULT_DISABLE_PUBLISH         = false
+    DEFAULT_INITIALIZE_NAMED_QUEUES = false
+    DEFAULT_DELETE_EXISTING_QUEUES  = false
+    DEFAULT_RABBIT_SCHEME           = 'amqps'
+    DEFAULT_RABBIT_HOST             = 'localhost'
+    DEFAULT_RABBIT_PORT             = 5671
+    DEFAULT_RABBIT_USER             = 'guest'
+    DEFAULT_RABBIT_PASSWORD         = 'guest'
+    DEFAULT_RABBIT_VHOST            = '%2f' # '/'
+    DEFAULT_RABBIT_URL              = "#{DEFAULT_RABBIT_SCHEME}://#{DEFAULT_RABBIT_USER}:#{DEFAULT_RABBIT_PASSWORD}@#{DEFAULT_RABBIT_HOST}:#{DEFAULT_RABBIT_PORT}/#{DEFAULT_RABBIT_VHOST}"
+    DEFAULT_EXCHANGE_NAME           = 'philotic.headers'
+    DEFAULT_TIMEOUT                 = 2
+    DEFAULT_ROUTING_KEY             = nil
+    DEFAULT_PERSISTENT              = true
     # DEFAULT_IMMEDIATE = false
-    DEFAULT_MANDATORY        = true
-    DEFAULT_CONTENT_TYPE     = nil
-    DEFAULT_CONTENT_ENCODING = nil
-    DEFAULT_PRIORITY         = nil
-    DEFAULT_MESSAGE_ID       = nil
-    DEFAULT_CORRELATION_ID   = nil
-    DEFAULT_REPLY_TO         = nil
-    DEFAULT_TYPE             = nil
-    DEFAULT_USER_ID          = nil
-    DEFAULT_APP_ID           = nil
-    DEFAULT_TIMESTAMP        = nil
-    DEFAULT_EXPIRATION       = nil
+    DEFAULT_MANDATORY               = true
+    DEFAULT_CONTENT_TYPE            = nil
+    DEFAULT_CONTENT_ENCODING        = nil
+    DEFAULT_PRIORITY                = nil
+    DEFAULT_MESSAGE_ID              = nil
+    DEFAULT_CORRELATION_ID          = nil
+    DEFAULT_REPLY_TO                = nil
+    DEFAULT_TYPE                    = nil
+    DEFAULT_USER_ID                 = nil
+    DEFAULT_APP_ID                  = nil
+    DEFAULT_TIMESTAMP               = nil
+    DEFAULT_EXPIRATION              = nil
 
     def defaults
       @defaults ||= Hash[Config.constants.select { |c| c.to_s.start_with? 'DEFAULT_' }.collect do |c|
-        key = c.slice(8..-1).downcase.to_sym
+                           key = c.slice(8..-1).downcase.to_sym
 
-        env_key = "#{ENV_PREFIX}_#{key}".upcase
+                           env_key = "#{ENV_PREFIX}_#{key}".upcase
 
-        [key, ENV[env_key] || Config.const_get(c)]
-      end
+                           [key, ENV[env_key] || Config.const_get(c)]
+                         end
       ]
     end
 
