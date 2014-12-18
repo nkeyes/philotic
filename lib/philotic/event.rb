@@ -1,3 +1,4 @@
+require 'philotic'
 require 'philotic/constants'
 require 'philotic/connection'
 require 'philotic/routable'
@@ -5,6 +6,21 @@ require 'philotic/routable'
 module Philotic
   class Event
     include Philotic::Routable
+
+    attr_accessor :connection
+
+    def initialize(routables={}, payloads={}, connection=nil)
+      self.timestamp         = Time.now.to_i
+      self.philotic_firehose = true
+      self.connection = connection
+
+      # dynamically insert any passed in routables into both attr_routable
+      # and attr_payload
+      # result:  ability to arbitrarily send a easily routable hash
+      # over into the bus
+      _set_routables_or_payloads(:routable, routables)
+      _set_routables_or_payloads(:payload, payloads)
+    end
 
     def self.inherited(sub)
       Philotic::PHILOTIC_HEADERS.each do |header|
@@ -30,25 +46,35 @@ module Philotic
     end
 
     def connection
-      Philotic::Connection.instance
+      @connection ||= Philotic.connection
     end
 
-    def set_routables_or_payloads(type, attrs)
+    def publish
+      connection.publish self
+    end
+
+    def self.publish(*args)
+      self.new(*args).publish
+    end
+
+    private
+
+    def _set_routables_or_payloads(type, attrs)
       attrs.each do |key, value|
         if self.respond_to?(:"#{key}=")
           send(:"#{key}=", value)
         elsif self.class == Philotic::Event
-          set_event_attribute(type, key, value)
+          _set_event_attribute(type, key, value)
         end
       end
     end
 
-    def set_event_attribute(type, key, value)
-      set_event_attribute_setter(key, type, value)
-      set_event_attribute_getter(key, type)
+    def _set_event_attribute(type, key, value)
+      _set_event_attribute_setter(key, type, value)
+      _set_event_attribute_getter(key, type)
     end
 
-    def set_event_attribute_getter(key, type)
+    def _set_event_attribute_getter(key, type)
       self.class.send("attr_#{type}_readers").concat([key])
       getter = lambda do
         instance_variable_get(:"@#{key}")
@@ -56,27 +82,13 @@ module Philotic
       self.class.send :define_method, :"#{key}", getter
     end
 
-    def set_event_attribute_setter(key, type, value)
+    def _set_event_attribute_setter(key, type, value)
       self.class.send("attr_#{type}_writers").concat([:"#{key}="])
       setter = lambda do |v|
         instance_variable_set(:"@#{key}", v)
       end
       self.class.send :define_method, :"#{key}=", setter
       self.send(:"#{key}=", value)
-    end
-
-    def initialize(routables={}, payloads=nil)
-      payloads               ||= {}
-      self.timestamp         = Time.now.to_i
-      self.philotic_firehose = true
-
-      # dynamically insert any passed in routables into both attr_routable
-      # and attr_payload
-      # result:  ability to arbitrarily send a easily routable hash
-      # over into the bus
-      set_routables_or_payloads(:routable, routables)
-      set_routables_or_payloads(:payload, payloads)
-      self
     end
   end
 end

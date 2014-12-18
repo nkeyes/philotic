@@ -41,7 +41,7 @@ describe Philotic::Event do
       expect(subject.headers.keys).to include :philotic_product
     end
   end
-  
+
   context 'generic event' do
     let(:headers) do
       {
@@ -65,5 +65,45 @@ describe Philotic::Event do
       expect(event.payload).to eq payloads
 
     end
+  end
+
+  describe '#publish' do
+    subject { Philotic::Event.new }
+    specify do
+      expect(subject.connection).to receive(:publish).with(subject)
+
+      subject.publish
+    end
+
+  end
+
+  describe '.publish' do
+    let (:connection) { double }
+    let(:headers) do
+      {
+          header1: 'h1',
+          header2: 'h2',
+          header3: 'h3',
+      }
+    end
+
+    let(:payloads) do
+      {
+          payload1: 'h1',
+          payload2: 'h2',
+          payload3: 'h3',
+      }
+    end
+    subject { Philotic::Event }
+    specify do
+      expect_any_instance_of(Philotic::Event).to receive(:connection).and_return(connection)
+      expect(connection).to receive(:publish) do |event|
+        expect(event.headers).to include(headers)
+        expect(event.payload).to eq payloads
+      end
+
+      subject.publish(headers, payloads)
+    end
+
   end
 end
