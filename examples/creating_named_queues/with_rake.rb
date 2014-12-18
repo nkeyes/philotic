@@ -7,5 +7,5 @@ require 'rake'
 
 require 'philotic/tasks'
 # equivelant of:
-# rake eb:init_queues[examples/creating_named_queues/philotic_named_queues.yml]
-Rake::Task["eb:init_queues"].invoke(File.join(File.dirname(__FILE__), ".", "philotic_named_queues.yml"))
+# rake philotic:init_queues[examples/creating_named_queues/philotic_queues.yml]
+Rake::Task['philotic:init_queues'].invoke(File.join(File.dirname(__FILE__), 'philotic_queues.yml'))

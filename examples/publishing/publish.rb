@@ -5,7 +5,9 @@ $stdout.sync = true
 require 'philotic'
 require 'philotic/dummy_event'
 
-Philotic.logger.level = Logger::WARN
+@philotic = Philotic::Connection.new
+
+@philotic.publisher.logger.level = Logger::WARN
 
 @event = Philotic::DummyEvent.new
 
@@ -24,7 +26,7 @@ def send_message number
   @event.gender  = [:F, :M].sample
   @event.message = "Message #{number}: Hey #{@event.gender == :M ? 'dude' : 'dudette'}"
 
-  @event.publish
+  @philotic.publish @event
 
 end
 

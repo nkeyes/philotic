@@ -4,15 +4,17 @@ $stdout.sync = true
 
 require 'philotic'
 require 'awesome_print'
+philotic = Philotic::Connection.new
 
-Philotic::Config.load_file(File.join(File.dirname(__FILE__), '../../', 'philotic.yml.example'))
 
-Philotic::Subscriber.subscribe('female_queue') do |metadata, message|
+philotic.config.load_file(File.join(File.dirname(__FILE__), '../../', 'philotic.yml.example'))
+
+philotic.subscriber.subscribe('female_queue') do |metadata, message|
   ap message[:attributes]
 end
 
-Philotic::Subscriber.subscribe('male_queue') do |metadata, message|
+philotic.subscriber.subscribe('male_queue') do |metadata, message|
   ap message[:attributes]
 end
 
-Philotic::Subscriber.endure
+philotic.subscriber.endure

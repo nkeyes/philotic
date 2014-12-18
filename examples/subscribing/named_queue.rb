@@ -5,9 +5,10 @@ $stdout.sync = true
 require 'philotic'
 require 'awesome_print'
 
+philotic = Philotic::Connection.new
 
-Philotic::Subscriber.subscribe('test_queue') do |metadata, message|
+philotic.subscriber.subscribe('test_queue') do |metadata, message|
   ap message[:attributes]
 end
 
-Philotic::Subscriber.endure
+philotic.subscriber.endure

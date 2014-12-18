@@ -5,21 +5,24 @@ $stdout.sync = true
 require 'philotic'
 require 'awesome_print'
 
+philotic = Philotic::Connection.new
+
+
 # sometimes ack
-Philotic::Subscriber.subscribe('flaky_queue', ack: true) do |metadata, message|
+philotic.subscriber.subscribe('flaky_queue', ack: true) do |metadata, message|
   ap message[:attributes]
-   [true, false].sample ? Philotic::Subscriber.acknowledge(message) : Philotic::Subscriber.reject(message)
+   [true, false].sample ? philotic.subscriber.acknowledge(message) : philotic.subscriber.reject(message)
 end
 
 # always ack
-Philotic::Subscriber.subscribe('flaky_queue', ack: true) do |metadata, message|
+philotic.subscriber.subscribe('flaky_queue', ack: true) do |metadata, message|
   ap message[:attributes]
-  Philotic::Subscriber.acknowledge(message, true)
+  philotic.subscriber.acknowledge(message, true)
 end
 
 # always reject
-Philotic::Subscriber.subscribe('flaky_queue', ack: true) do |metadata, message|
+philotic.subscriber.subscribe('flaky_queue', ack: true) do |metadata, message|
   ap message[:attributes]
-  Philotic::Subscriber.reject message
+  philotic.subscriber.reject message
 end
-Philotic::Subscriber.endure
+philotic.subscriber.endure
