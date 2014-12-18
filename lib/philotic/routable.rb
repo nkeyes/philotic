@@ -61,10 +61,6 @@ module Philotic
         attr_routable_writers.concat(names)
         attr_accessor(*names)
       end
-
-      def publish(*args)
-        self.new(*args).publish
-      end
     end
 
     def payload
@@ -86,10 +82,6 @@ module Philotic
     def message_metadata= options
       @message_metadata ||= {}
       @message_metadata.merge! options
-    end
-
-    def publish
-      Philotic::Publisher.publish self
     end
 
     private

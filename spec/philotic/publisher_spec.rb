@@ -1,5 +1,7 @@
 require 'spec_helper'
 require 'philotic/dummy_event'
+require 'philotic/connection'
+require 'philotic/publisher'
 
 describe Philotic::Publisher do
   let(:event) do
@@ -11,15 +13,8 @@ describe Philotic::Publisher do
 
     event
   end
-  let(:publisher) { Philotic::Publisher }
+  let(:publisher) { Philotic::Connection.new.publisher }
   subject { publisher }
-
-  describe 'config' do
-    it 'should return the Philotic::Config singleton' do
-      expect(subject.config).to eq Philotic::Config
-    end
-  end
-
 
   describe 'publish' do
     it 'should call _publish with the right values' do
@@ -51,10 +46,10 @@ describe Philotic::Publisher do
     it 'should call exchange.publish with the right values' do
       Timecop.freeze
       exchange = double
-      expect(Philotic::Connection).to receive(:exchange).and_return(exchange)
+      expect(subject.connection).to receive(:exchange).and_return(exchange)
 
-      expect(Philotic).to receive(:connect!)
-      expect(Philotic::Connection).to receive(:connected?).and_return(true)
+      expect(subject.connection).to receive(:connect!)
+      expect(subject.connection).to receive(:connected?).and_return(true)
       metadata = {
           routing_key:      nil,
           persistent:       true,
@@ -94,10 +89,10 @@ describe Philotic::Publisher do
     it 'should log an error when there is no connection' do
 
 
-      expect(Philotic).to receive(:connect!)
-      expect(Philotic::Connection).to receive(:connected?).once.and_return(false)
+      expect(subject.connection).to receive(:connect!)
+      expect(subject.connection).to receive(:connected?).once.and_return(false)
 
-      expect(Philotic.logger).to receive(:error)
+      expect(subject.logger).to receive(:error)
       subject.publish(event)
     end
 

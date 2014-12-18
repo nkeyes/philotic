@@ -8,7 +8,17 @@ module Philotic
       end
     end
 
-    def self.subscription_callback
+    attr_accessor :connection
+
+    def initialize(connection)
+      @connection = connection
+    end
+
+    def logger
+      connection.logger
+    end
+
+    def subscription_callback
       lambda do |delivery_info, metadata, payload|
         hash_payload = JSON.parse payload
 
@@ -22,13 +32,13 @@ module Philotic
       end
     end
 
-    def self.subscribe(subscription = {}, subscribe_options = Philotic::DEFAULT_SUBSCRIBE_OPTIONS, &block)
-      Philotic.connect!
-      @exchange = Philotic::Connection.exchange
+    def subscribe(subscription = {}, subscribe_options = Philotic::DEFAULT_SUBSCRIBE_OPTIONS, &block)
+      connection.connect!
+      @exchange = connection.exchange
 
       subscription_settings = get_subscription_settings subscription, subscribe_options
 
-      q = Philotic::Connection.channel.queue(subscription_settings[:queue_name], subscription_settings[:queue_options])
+      q = connection.channel.queue(subscription_settings[:queue_name], subscription_settings[:queue_options])
 
       q.bind(@exchange, arguments: subscription_settings[:arguments]) if subscription_settings[:arguments]
 
@@ -36,7 +46,7 @@ module Philotic
 
     end
 
-    def self.get_subscription_settings(subscription, subscribe_options)
+    def get_subscription_settings(subscription, subscribe_options)
 
       if subscription.is_a? String
         queue_name    = subscription
@@ -63,21 +73,21 @@ module Philotic
       }
     end
 
-    def self.acknowledge(message, up_to_and_including=false)
-      Philotic::Connection.channel.acknowledge(message[:delivery_info].delivery_tag, up_to_and_including)
+    def acknowledge(message, up_to_and_including=false)
+      connection.channel.acknowledge(message[:delivery_info].delivery_tag, up_to_and_including)
     end
 
-    def self.reject(message, requeue=true)
-      Philotic::Connection.channel.reject(message[:delivery_info].delivery_tag, requeue)
+    def reject(message, requeue=true)
+      connection.channel.reject(message[:delivery_info].delivery_tag, requeue)
     end
 
-    def self.subscribe_to_any(options = {})
+    def subscribe_to_any(options = {})
       if block_given?
-        self.subscribe(options.merge(:'x-match' => :any), &Proc.new)
+        subscribe(options.merge(:'x-match' => :any), &Proc.new)
       end
     end
 
-    def self.endure
+    def endure
       while true
         Thread.pass
       end

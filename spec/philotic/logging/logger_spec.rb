@@ -3,19 +3,26 @@ require 'spec_helper'
 module Philotic
   module Logging
     describe Logger do
-      let (:device) { double }
+      let(:device) do
+        fd = IO.sysopen('/dev/null', 'w')
+        IO.new(fd, 'w')
+
+      end
       let(:logger) { Philotic::Logging::Logger.new(device) }
       let(:message) { 'Hey!' }
       let(:error_message) { "These are not the droids you're looking for" }
+
+      before do
+        logger.connection = Philotic::Connection.new
+      end
       specify do
 
-        expect(Philotic::Publisher).to receive(:publish) do |event|
+        expect(logger.connection).to receive(:publish) do |event|
           expect(event.message).to eq message
           expect(event.severity).to eq Logger::INFO
 
         end
-        expect(device).to receive(:respond_to?).with(:write).and_return(true)
-        expect(device).to receive(:respond_to?).with(:close).and_return(true)
+
         expect(device).to receive(:write) do |log_message|
           expect(log_message).to match /#{message}/
         end
@@ -24,11 +31,10 @@ module Philotic
       end
 
       it "should not die if it can't log to RabbitMQ" do
-        expect(Philotic::Publisher).to receive(:publish) do |event|
+        expect(logger.connection).to receive(:publish) do |event|
           raise error_message
         end
-        expect(device).to receive(:respond_to?).with(:write).and_return(true)
-        expect(device).to receive(:respond_to?).with(:close).and_return(true)
+
         expect(device).to receive(:write) do |log_message|
           expect(log_message).to match /#{message}/
         end

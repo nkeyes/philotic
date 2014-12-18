@@ -5,11 +5,13 @@ $stdout.sync = true
 require 'philotic'
 require 'awesome_print'
 
-Philotic::Config.load_file(File.join(File.dirname(__FILE__), '../../', 'philotic.yml.example'))
+philotic = Philotic::Connection.new
+
+philotic.config.load_file(File.join(File.dirname(__FILE__), '../../', 'philotic.yml.example'))
 
 
-Philotic::Subscriber.subscribe(philotic_firehose: true) do |metadata, message|
+philotic.subscriber.subscribe(philotic_firehose: true) do |metadata, message|
   ap message[:attributes]
 end
 
-Philotic::Subscriber.endure
+philotic.subscriber.endure
