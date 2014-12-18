@@ -15,7 +15,6 @@ describe Philotic::Connection do
           expect(subject).to receive(:set_exchange_return_handler!)
 
           subject.connect!
-
         end
       end
 
@@ -27,7 +26,6 @@ describe Philotic::Connection do
           expect(Philotic.logger).to receive(:error)
 
           subject.connect!
-
         end
       end
     end
@@ -40,7 +38,6 @@ describe Philotic::Connection do
           expect(subject).not_to receive(:set_exchange_return_handler!)
 
           subject.connect!
-
         end
       end
     end
@@ -53,6 +50,18 @@ describe Philotic::Connection do
       expect(connection).to receive(:start)
 
       Philotic::Connection.start_connection!
+    end
+  end
+
+  describe '.close' do
+    let(:connection) { double }
+    specify do
+      allow(Philotic::Connection).to receive(:connection).and_return(connection)
+      expect(connection).to receive(:connected?).and_return(true)
+      expect(connection).to receive(:close)
+      expect(Philotic::Connection.instance_variable_get(:@channel)).to eq(nil)
+      expect(Philotic::Connection.instance_variable_get(:@exchange)).to eq(nil)
+      Philotic::Connection.close
     end
   end
 end

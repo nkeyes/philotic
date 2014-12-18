@@ -44,6 +44,8 @@ module Philotic
     def close
       Philotic.logger.info "closing connection to RabbitMQ; host:#{config.rabbit_host}"
       connection.close if connected?
+      @channel = nil
+      @exchange = nil
     end
 
     def connected?
