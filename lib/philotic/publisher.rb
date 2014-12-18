@@ -1,11 +1,23 @@
 require 'philotic/connection'
 
 module Philotic
-  module Publisher
-    extend self
+  class Publisher
+
+    attr_accessor :connection
+    attr_accessor :logger
+    attr_accessor :log_event_handler
+
+    def initialize(connection, logger = nil)
+      @connection = connection
+      @logger = logger
+    end
+
+    def logger
+      @logger ||= Logger.new(STDOUT)
+    end
 
     def config
-      Philotic::Config
+      connection.config
     end
 
     def publish(event)
@@ -17,20 +29,20 @@ module Philotic
     private
     def _publish(payload, message_metadata = {})
       if config.disable_publish
-        Philotic.log_event_published(:warn,  message_metadata, payload, 'attempted to publish a message when publishing is disabled.')
+        log_event_published(:warn,  message_metadata, payload, 'attempted to publish a message when publishing is disabled.')
         return false
       end
-      Philotic.connect!
-      unless Philotic::Connection.connected?
-        Philotic.log_event_published(:error, message_metadata, payload, 'unable to publish event, not connected to RabbitMQ')
+      connection.connect!
+      unless connection.connected?
+        log_event_published(:error, message_metadata, payload, 'unable to publish event, not connected to RabbitMQ')
         return
       end
       message_metadata = merge_metadata(message_metadata)
 
       payload = normalize_payload_times(payload)
 
-      Philotic::Connection.exchange.publish(payload.to_json, message_metadata)
-      Philotic.log_event_published(:debug, message_metadata, payload, 'published event')
+      connection.exchange.publish(payload.to_json, message_metadata)
+      log_event_published(:debug, message_metadata, payload, 'published event')
     end
 
     def normalize_payload_times(payload)
@@ -52,6 +64,18 @@ module Philotic
       message_metadata[:headers] ||= {}
       message_metadata[:headers] = {philotic_firehose: true}.merge(message_metadata[:headers])
       message_metadata
+    end
+
+    def on_publish_event(&block)
+      @log_event_handler = block
+    end
+
+    def log_event_published(severity, metadata, payload, message)
+      if @log_event_handler
+        @log_event_handler.call(severity, metadata, payload, message)
+      else
+        logger.send(severity, "#{message}; message_metadata:#{metadata}, payload:#{payload.to_json}")
+      end
     end
   end
 end

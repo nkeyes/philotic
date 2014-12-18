@@ -6,8 +6,7 @@ require 'cgi'
 require 'bunny/session'
 
 module Philotic
-  module Config
-    extend self
+  class Config
 
     ENV_PREFIX = 'PHILOTIC'
 
@@ -39,6 +38,16 @@ module Philotic
     DEFAULT_TIMESTAMP               = nil
     DEFAULT_EXPIRATION              = nil
 
+    attr_accessor :logger
+    
+    def initialize(config={})
+      load config
+    end
+
+    def logger
+      @logger ||= Logger.new(STDOUT)
+    end
+
     def defaults
       @defaults ||= Hash[Config.constants.select { |c| c.to_s.start_with? 'DEFAULT_' }.collect do |c|
                            key = c.slice(8..-1).downcase.to_sym
@@ -66,23 +75,23 @@ module Philotic
 
     def connection_failed_handler
       @connection_failed_handler ||= lambda do |settings|
-        Philotic.logger.error "RabbitMQ connection failure; host:#{rabbit_host}"
+        logger.error "RabbitMQ connection failure; host:#{rabbit_host}"
       end
     end
 
     def connection_loss_handler
       @connection_loss_handler ||= lambda do |conn, settings|
-        Philotic.logger.warn "RabbitMQ connection loss; host:#{rabbit_host}"; conn.reconnect(false, 2)
+        logger.warn "RabbitMQ connection loss; host:#{rabbit_host}"; conn.reconnect(false, 2)
       end
     end
 
     def message_return_handler
       @message_return_handler ||= lambda do |basic_return, metadata, payload|
-        Philotic.logger.warn "Philotic message #{JSON.parse payload} was returned! reply_code = #{basic_return.reply_code}, reply_text = #{basic_return.reply_text} headers = #{metadata[:headers]}"
+        logger.warn "Philotic message #{JSON.parse payload} was returned! reply_code = #{basic_return.reply_code}, reply_text = #{basic_return.reply_text} headers = #{metadata[:headers]}"
       end
     end
 
-    def self.parse_rabbit_uri
+    def parse_rabbit_uri
       settings            = Bunny::Session.parse_uri(@rabbit_url || defaults[:rabbit_url])
       settings[:password] = settings.delete(:pass)
 
@@ -91,20 +100,20 @@ module Philotic
         current_value = send("rabbit_#{setting}")
 
         # only use the value from the URI if the existing value is nil or the default
-        if settings[setting] && [const_get("default_rabbit_#{setting}".upcase), nil].include?(current_value)
+        if settings[setting] && [self.class.const_get("default_rabbit_#{setting}".upcase), nil].include?(current_value)
           send("rabbit_#{setting}=", settings[setting])
         end
       end
 
     end
 
-    def self.rabbit_url
-      self.parse_rabbit_uri
+    def rabbit_url
+      parse_rabbit_uri
       "#{rabbit_scheme}://#{rabbit_user}:#{rabbit_password}@#{rabbit_host}:#{rabbit_port}/#{CGI.escape rabbit_vhost}"
     end
 
     def load(config)
-      Philotic.logger # ensure the logger can be created, so we crash early if it can't
+      logger # ensure the logger can be created, so we crash early if it can't
 
       config.each do |k, v|
         mutator = "#{k}="
