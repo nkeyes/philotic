@@ -8,6 +8,8 @@ require 'philotic/subscriber'
 
 module Philotic
   class Connection
+    extend Forwardable
+
     attr_reader :connection
     attr_accessor :logger
 
@@ -133,8 +135,7 @@ module Philotic
       @logger
     end
 
-    def publish(event)
-      publisher.publish(event)
-    end
+    def_delegators :publisher, :publish
+    def_delegators :subscriber, :subscribe
   end
 end
