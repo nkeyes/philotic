@@ -27,3 +27,5 @@ RSpec.configure do |config|
     Timecop.return
   end
 end
+
+ENV['PHILOTIC_LOG_LEVEL'] = "#{Logger::FATAL}"

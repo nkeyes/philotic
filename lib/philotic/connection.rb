@@ -14,11 +14,11 @@ module Philotic
     attr_writer :publisher, :subscriber
 
     def publisher
-      @publisher ||= Philotic::Publisher.new self, logger
+      @publisher ||= Philotic::Publisher.new self
     end
 
     def subscriber
-      @subscriber ||= Philotic::Subscriber.new self, logger
+      @subscriber ||= Philotic::Subscriber.new self
     end
 
     def config
@@ -126,7 +126,11 @@ module Philotic
     end
 
     def logger
-      @logger ||= Logger.new(STDOUT)
+      unless @logger
+        @logger = Logger.new(STDOUT)
+        @logger.level = config.log_level
+      end
+      @logger
     end
 
     def publish(event)

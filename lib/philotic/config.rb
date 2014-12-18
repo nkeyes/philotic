@@ -4,6 +4,7 @@ require 'singleton'
 require 'forwardable'
 require 'cgi'
 require 'bunny/session'
+require 'logger'
 
 module Philotic
   class Config
@@ -13,6 +14,7 @@ module Philotic
     DEFAULT_DISABLE_PUBLISH         = false
     DEFAULT_INITIALIZE_NAMED_QUEUES = false
     DEFAULT_DELETE_EXISTING_QUEUES  = false
+    DEFAULT_LOG_LEVEL               = Logger::DEBUG
     DEFAULT_RABBIT_SCHEME           = 'amqp'
     DEFAULT_RABBIT_HOST             = 'localhost'
     DEFAULT_RABBIT_PORT             = 5672
@@ -39,7 +41,7 @@ module Philotic
     DEFAULT_EXPIRATION              = nil
 
     attr_accessor :logger
-    
+
     def initialize(config={})
       load config
     end
@@ -71,6 +73,9 @@ module Philotic
       end
     end
 
+    def log_level
+      @log_level ||= defaults[:log_level].to_i
+    end
     attr_writer :connection_failed_handler, :connection_loss_handler, :message_return_handler
 
     def connection_failed_handler

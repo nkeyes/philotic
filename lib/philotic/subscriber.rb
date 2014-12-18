@@ -9,17 +9,15 @@ module Philotic
     end
 
     attr_accessor :connection
-    attr_accessor :logger
 
-    def initialize(connection, logger = nil)
+    def initialize(connection)
       @connection = connection
-      @logger = logger
     end
 
     def logger
-      @logger ||= Logger.new(STDOUT)
+      connection.logger
     end
-    
+
     def subscription_callback
       lambda do |delivery_info, metadata, payload|
         hash_payload = JSON.parse payload

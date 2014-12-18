@@ -4,16 +4,14 @@ module Philotic
   class Publisher
 
     attr_accessor :connection
-    attr_accessor :logger
     attr_accessor :log_event_handler
 
-    def initialize(connection, logger = nil)
+    def initialize(connection)
       @connection = connection
-      @logger = logger
     end
 
     def logger
-      @logger ||= Logger.new(STDOUT)
+      connection.logger
     end
 
     def config
