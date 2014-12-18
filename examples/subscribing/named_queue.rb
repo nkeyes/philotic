@@ -5,7 +5,7 @@ $stdout.sync = true
 require 'philotic'
 require 'awesome_print'
 
-Philotic.subscriber.subscribe('test_queue') do |metadata, message|
+Philotic.subscribe('test_queue') do |metadata, message|
   ap message[:attributes]
 end
 

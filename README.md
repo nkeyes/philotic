@@ -19,7 +19,7 @@ Philotic.config.message_return_handler = lambda do |basic_return, metadata, mess
   Philotic.logger.warn "Message returned. reply_text: #{basic_return.reply_text}"
 end
 
-Philotic.subscriber.subscribe(header_key: 'header_1') do |metadata, message|
+Philotic.subscribe(header_key: 'header_1') do |metadata, message|
   ap message[:attributes]
 end
 
@@ -48,7 +48,7 @@ philotic.config.message_return_handler = lambda do |basic_return, metadata, mess
   philotic.logger.warn "Message returned. reply_text: #{basic_return.reply_text}"
 end
 
-philotic.subscriber.subscribe(header_key: 'header_1') do |metadata, message|
+philotic.subscribe(header_key: 'header_1') do |metadata, message|
   ap message[:attributes]
 end
 
