@@ -7,7 +7,7 @@ require 'philotic/subscriber'
 describe Philotic::Subscriber do
 
 
-  describe '.subscribe' do
+  describe '#subscribe' do
     let(:subscription) { 'some_queue' }
     subject { Philotic::Connection.new.subscriber }
     context 'when options is a string' do
@@ -70,7 +70,7 @@ describe Philotic::Subscriber do
     end
   end
 
-  describe '.subscribe_to_any' do
+  describe '#subscribe_to_any' do
     let(:headers) do
       {
           header1: 'h1',
@@ -86,7 +86,7 @@ describe Philotic::Subscriber do
     end
   end
 
-  describe '.acknowledge' do
+  describe '#acknowledge' do
     let(:channel) { double }
     let(:delivery_tag) { double }
     let(:delivery_info) { double }
@@ -101,7 +101,7 @@ describe Philotic::Subscriber do
     end
   end
 
-  describe '.reject' do
+  describe '#reject' do
     let(:channel) { double }
     let(:delivery_tag) { double }
     let(:delivery_info) { double }

@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Philotic::Connection do
 
 
-  describe '.connect!' do
+  describe '#connect!' do
     subject { Philotic::Connection.new }
     context 'not connected' do
       context 'success' do
@@ -41,7 +41,7 @@ describe Philotic::Connection do
     end
   end
 
-  describe '.start_connection!' do
+  describe '#start_connection!' do
     let(:connection) { double }
     subject { Philotic::Connection.new }
     specify do
@@ -52,7 +52,7 @@ describe Philotic::Connection do
     end
   end
 
-  describe '.close' do
+  describe '#close' do
     let(:connection) { double }
     subject { Philotic::Connection.new }
     specify do
@@ -65,7 +65,7 @@ describe Philotic::Connection do
     end
   end
 
-  describe '.initialize_named_queue!' do
+  describe '#initialize_named_queue!' do
     let(:test_queues) do
       {
           app_live_feed: {

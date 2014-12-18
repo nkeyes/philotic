@@ -4,16 +4,16 @@ require 'philotic/connection'
 
 describe Philotic::Config do
 
-  describe '.defaults' do
+  describe '#defaults' do
   end
 
-  describe '.load' do
+  describe '#load' do
   end
 
-  describe '.load_file' do
+  describe '#load_file' do
   end
 
-  describe '.parse_rabbit_uri' do
+  describe '#parse_rabbit_uri' do
     let(:url) { 'amqp://user:pass@host:12345/vhost' }
     let(:config) { Philotic::Connection.new.config }
     before do
