@@ -13,7 +13,6 @@ SimpleCov.start do
 end
 require 'bundler/setup'
 require 'rspec/its'
-require 'philotic'
 require 'timecop'
 
 Bundler.require(:default, :test)

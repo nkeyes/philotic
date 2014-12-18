@@ -1,3 +1,5 @@
+require 'philotic/constants'
+
 module Philotic
   class Subscriber
     class Metadata

@@ -1,4 +1,4 @@
-require 'philotic/connection'
+require 'philotic/constants'
 
 module Philotic
   class Publisher
