@@ -1,7 +1,6 @@
-require 'philotic'
 require 'philotic/constants'
-require 'philotic/connection'
 require 'philotic/routable'
+require 'philotic/singleton'
 
 module Philotic
   class Event

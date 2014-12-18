@@ -2,6 +2,7 @@ require 'json'
 require 'bunny'
 require 'logger'
 
+require 'philotic/constants'
 require 'philotic/config'
 require 'philotic/publisher'
 require 'philotic/subscriber'
@@ -119,7 +120,7 @@ module Philotic
     end
 
     def queue_from_config(queue_name, config)
-      queue_options = DEFAULT_NAMED_QUEUE_OPTIONS.dup
+      queue_options = Philotic::DEFAULT_NAMED_QUEUE_OPTIONS.dup
       queue_options.merge!(config[:options] || {})
 
       channel.queue(queue_name, queue_options).tap do
