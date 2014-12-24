@@ -43,6 +43,7 @@ describe Philotic::Connection do
 
   describe '#start_connection!' do
     let(:connection) { double }
+    let(:connection_error) {Bunny::TCPConnectionFailed.new 'connection failed', 'localhost', '5672'}
     subject { Philotic::Connection.new }
     specify do
       expect(Bunny).to receive(:new).with(subject.config.rabbit_url, subject.connection_settings).and_return(connection)
@@ -50,6 +51,15 @@ describe Philotic::Connection do
 
       subject.start_connection!
     end
+
+    it 'should retry connecting' do
+      expect(Bunny).to receive(:new) do
+        raise connection_error
+      end.exactly(subject.config.connection_retries + 1).times
+
+      expect { subject.start_connection! }.to raise_error(Philotic::Connection::TCPConnectionFailed)
+    end
+
   end
 
   describe '#close' do

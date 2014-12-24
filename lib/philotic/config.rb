@@ -39,6 +39,7 @@ module Philotic
     DEFAULT_APP_ID                  = nil
     DEFAULT_TIMESTAMP               = nil
     DEFAULT_EXPIRATION              = nil
+    DEFAULT_CONNECTION_RETRIES      = 2
 
     attr_accessor :connection
 
@@ -77,6 +78,11 @@ module Philotic
     def log_level
       @log_level ||= defaults[:log_level].to_i
     end
+
+    def connection_retries
+      @connection_retries ||= defaults[:connection_retries].to_i
+    end
+
     attr_writer :connection_failed_handler, :connection_loss_handler, :message_return_handler
 
     def connection_failed_handler

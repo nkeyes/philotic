@@ -21,19 +21,25 @@ module Philotic
     def publish(event)
       message_metadata = {headers: event.headers}
       message_metadata.merge!(event.message_metadata) if event.message_metadata
-      _publish(event.payload, message_metadata)
+      begin
+        event.published = _publish(event.payload, message_metadata)
+      rescue => e
+        event.publish_error = e
+        logger.error e.message
+      end
+      event
     end
 
     private
     def _publish(payload, message_metadata = {})
       if config.disable_publish
-        log_event_published(:warn,  message_metadata, payload, 'attempted to publish a message when publishing is disabled.')
+        log_event_published(:warn, message_metadata, payload, 'attempted to publish a message when publishing is disabled.')
         return false
       end
       connection.connect!
       unless connection.connected?
         log_event_published(:error, message_metadata, payload, 'unable to publish event, not connected to RabbitMQ')
-        return
+        return false
       end
       message_metadata = merge_metadata(message_metadata)
 
@@ -41,6 +47,7 @@ module Philotic
 
       connection.exchange.publish(payload.to_json, message_metadata)
       log_event_published(:debug, message_metadata, payload, 'published event')
+      true
     end
 
     def normalize_payload_times(payload)
