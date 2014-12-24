@@ -1,7 +1,7 @@
 require 'json'
 require 'bunny'
 require 'logger'
-
+require 'bunny'
 require 'philotic/constants'
 require 'philotic/config'
 require 'philotic/publisher'
@@ -9,12 +9,19 @@ require 'philotic/subscriber'
 
 module Philotic
   class Connection
+
+    class TCPConnectionFailed < Bunny::TCPConnectionFailed; end
+
     extend Forwardable
 
-    attr_reader :connection
+    attr_reader :connection, :connection_attempts
     attr_accessor :logger
 
     attr_writer :publisher, :subscriber
+
+    def initialize
+      @connection_attempts = 0
+    end
 
     def publisher
       @publisher ||= Philotic::Publisher.new self
@@ -44,7 +51,20 @@ module Philotic
     end
 
     def start_connection!
-      @connection = Bunny.new(config.rabbit_url, connection_settings)
+      begin
+        attempt_connection
+      rescue ::Bunny::TCPConnectionFailed => e
+        if connection_attempts <= config.connection_retries
+          retry
+        else
+          raise TCPConnectionFailed.new "Failed to connect after #{connection_attempts} attempts", config.rabbit_host, config.rabbit_port
+        end
+      end
+    end
+
+    def attempt_connection
+      @connection_attempts += 1
+      @connection          = Bunny.new(config.rabbit_url, connection_settings)
       @connection.start
     end
 
@@ -130,7 +150,7 @@ module Philotic
 
     def logger
       unless @logger
-        @logger = Logger.new(STDOUT)
+        @logger       = Logger.new(STDOUT)
         @logger.level = config.log_level
       end
       @logger
