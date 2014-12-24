@@ -22,8 +22,7 @@ module Philotic
       message_metadata = {headers: event.headers}
       message_metadata.merge!(event.message_metadata) if event.message_metadata
       begin
-        _publish(event.payload, message_metadata)
-        event.published = true
+        event.published = _publish(event.payload, message_metadata)
       rescue => e
         event.publish_error = e
         logger.error e.message
@@ -40,7 +39,7 @@ module Philotic
       connection.connect!
       unless connection.connected?
         log_event_published(:error, message_metadata, payload, 'unable to publish event, not connected to RabbitMQ')
-        return
+        return false
       end
       message_metadata = merge_metadata(message_metadata)
 
@@ -48,6 +47,7 @@ module Philotic
 
       connection.exchange.publish(payload.to_json, message_metadata)
       log_event_published(:debug, message_metadata, payload, 'published event')
+      true
     end
 
     def normalize_payload_times(payload)

@@ -39,7 +39,7 @@ describe Philotic::Publisher do
                          )
       expect(event).to_not be_published
       subject.publish(event)
-      expect(event).to be_published
+      expect(event).to_not be_published # not connected
     end
 
     it 'should fail gracefully' do
@@ -113,7 +113,7 @@ describe Philotic::Publisher do
       expect(subject.logger).to receive(:error)
       expect(event).to_not be_published
       subject.publish(event)
-      expect(event).to be_published
+      expect(event).to_not be_published
     end
 
   end
