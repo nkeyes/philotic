@@ -6,7 +6,8 @@ module Philotic
   class Event
     include Philotic::Routable
 
-    attr_accessor :connection
+    attr_accessor :connection, :publish_error
+    attr_writer :published
 
     def initialize(routables={}, payloads={}, connection=nil)
       self.timestamp         = Time.now.to_i
@@ -19,6 +20,8 @@ module Philotic
       # over into the bus
       _set_routables_or_payloads(:routable, routables)
       _set_routables_or_payloads(:payload, payloads)
+
+      @published = false
     end
 
     def self.inherited(sub)
@@ -46,6 +49,10 @@ module Philotic
 
     def connection
       @connection ||= Philotic.connection
+    end
+
+    def published?
+     !!@published
     end
 
     def publish

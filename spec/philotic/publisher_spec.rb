@@ -17,6 +17,7 @@ describe Philotic::Publisher do
   subject { publisher }
 
   describe 'publish' do
+    let(:publish_error) {StandardError.new 'publish error'}
     it 'should call _publish with the right values' do
       Timecop.freeze
       expect(subject).to receive(:_publish).with(
@@ -36,7 +37,22 @@ describe Philotic::Publisher do
                                  timestamp: Time.now.to_i
                              }
                          )
+      expect(event).to_not be_published
       subject.publish(event)
+      expect(event).to be_published
+    end
+
+    it 'should fail gracefully' do
+      expect(subject).to receive(:_publish) do
+        raise publish_error
+      end
+
+      expect(subject.logger).to receive(:error).with(publish_error.message)
+      expect(event).to_not be_published
+      subject.publish(event)
+      expect(event).to_not be_published
+      expect(event.publish_error).to eq publish_error
+
     end
 
   end
@@ -83,7 +99,9 @@ describe Philotic::Publisher do
                               }.to_json,
                               metadata
                           )
+      expect(event).to_not be_published
       subject.publish(event)
+      expect(event).to be_published
     end
 
     it 'should log an error when there is no connection' do
@@ -93,7 +111,9 @@ describe Philotic::Publisher do
       expect(subject.connection).to receive(:connected?).once.and_return(false)
 
       expect(subject.logger).to receive(:error)
+      expect(event).to_not be_published
       subject.publish(event)
+      expect(event).to be_published
     end
 
   end

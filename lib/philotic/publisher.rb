@@ -21,13 +21,20 @@ module Philotic
     def publish(event)
       message_metadata = {headers: event.headers}
       message_metadata.merge!(event.message_metadata) if event.message_metadata
-      _publish(event.payload, message_metadata)
+      begin
+        _publish(event.payload, message_metadata)
+        event.published = true
+      rescue => e
+        event.publish_error = e
+        logger.error e.message
+      end
+      event
     end
 
     private
     def _publish(payload, message_metadata = {})
       if config.disable_publish
-        log_event_published(:warn,  message_metadata, payload, 'attempted to publish a message when publishing is disabled.')
+        log_event_published(:warn, message_metadata, payload, 'attempted to publish a message when publishing is disabled.')
         return false
       end
       connection.connect!
