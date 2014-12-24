@@ -8,18 +8,18 @@ require 'awesome_print'
 # sometimes ack
 Philotic.subscribe('flaky_queue', ack: true) do |metadata, message|
   ap message[:attributes]
-   [true, false].sample ? Philotic.subscriber.acknowledge(message) : Philotic.subscriber.reject(message)
+   [true, false].sample ? acknowledge(message) : reject(message)
 end
 
 # always ack
 Philotic.subscribe('flaky_queue', ack: true) do |metadata, message|
   ap message[:attributes]
-  Philotic.subscriber.acknowledge(message, true)
+  acknowledge(message, true)
 end
 
 # always reject
 Philotic.subscribe('flaky_queue', ack: true) do |metadata, message|
   ap message[:attributes]
-  Philotic.subscriber.reject message
+  reject message
 end
 Philotic.subscriber.endure
