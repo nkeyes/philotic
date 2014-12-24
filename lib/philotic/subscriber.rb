@@ -20,7 +20,7 @@ module Philotic
       connection.logger
     end
 
-    def subscription_callback
+    def subscription_callback(&block)
       lambda do |delivery_info, metadata, payload|
         hash_payload = JSON.parse payload
 
@@ -30,7 +30,8 @@ module Philotic
             delivery_info: delivery_info,
             attributes:    metadata[:headers] ? hash_payload.merge(metadata[:headers]) : hash_payload
         }
-        yield(Metadata.new(metadata), event)
+
+        instance_exec(Metadata.new(metadata), event, &block)
       end
     end
 
