@@ -30,6 +30,16 @@ module Philotic
       event
     end
 
+    def normalize_payload_times(payload)
+      payload.each do |k, v|
+        if v.respond_to?(:utc)
+          payload[k] = v.utc
+        elsif v.respond_to?(:to_utc)
+          payload[k] = v.to_utc
+        end
+      end
+    end
+
     private
     def _publish(payload, message_metadata = {})
       if config.disable_publish
@@ -48,16 +58,6 @@ module Philotic
       connection.exchange.publish(payload.to_json, message_metadata)
       log_event_published(:debug, message_metadata, payload, 'published event')
       true
-    end
-
-    def normalize_payload_times(payload)
-      payload.each do |k, v|
-        if v.respond_to?(:utc)
-          payload[k] = v.utc
-        elsif v.respond_to?(:to_utc)
-          payload[k] = v.to_utc
-        end
-      end
     end
 
     def merge_metadata(message_metadata)

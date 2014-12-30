@@ -39,7 +39,7 @@ module Philotic
     DEFAULT_APP_ID                  = nil
     DEFAULT_TIMESTAMP               = nil
     DEFAULT_EXPIRATION              = nil
-    DEFAULT_CONNECTION_RETRIES      = 2
+    DEFAULT_CONNECTION_ATTEMPTS     = 3
 
     attr_accessor :connection
 
@@ -79,27 +79,28 @@ module Philotic
       @log_level ||= defaults[:log_level].to_i
     end
 
-    def connection_retries
-      @connection_retries ||= defaults[:connection_retries].to_i
+    def connection_attempts
+      @connection_retries ||= defaults[:connection_attempts].to_i
     end
 
     attr_writer :connection_failed_handler, :connection_loss_handler, :message_return_handler
 
     def connection_failed_handler
       @connection_failed_handler ||= lambda do |settings|
-        logger.error "RabbitMQ connection failure; host:#{rabbit_host}"
+        logger.error { "RabbitMQ connection failure; host:#{rabbit_host}" }
       end
     end
 
     def connection_loss_handler
       @connection_loss_handler ||= lambda do |conn, settings|
-        logger.warn "RabbitMQ connection loss; host:#{rabbit_host}"; conn.reconnect(false, 2)
+        logger.warn { "RabbitMQ connection loss; host:#{rabbit_host}" }
+        conn.reconnect(false, 2)
       end
     end
 
     def message_return_handler
       @message_return_handler ||= lambda do |basic_return, metadata, payload|
-        logger.warn "Philotic message #{JSON.parse payload} was returned! reply_code = #{basic_return.reply_code}, reply_text = #{basic_return.reply_text} headers = #{metadata[:headers]}"
+        logger.warn { "Philotic message #{JSON.parse payload} was returned! reply_code = #{basic_return.reply_code}, reply_text = #{basic_return.reply_text} headers = #{metadata[:headers]}" }
       end
     end
 
@@ -122,6 +123,11 @@ module Philotic
     def rabbit_url
       parse_rabbit_uri
       "#{rabbit_scheme}://#{rabbit_user}:#{rabbit_password}@#{rabbit_host}:#{rabbit_port}/#{CGI.escape rabbit_vhost}"
+    end
+
+    def sanitized_rabbit_url
+      parse_rabbit_uri
+      rabbit_url.gsub("#{rabbit_user}:#{rabbit_password}", '[USER_REDACTED]:[PASSWORD_REDACTED]')
     end
 
     def load_config(config)

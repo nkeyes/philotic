@@ -55,7 +55,7 @@ describe Philotic::Connection do
     it 'should retry connecting' do
       expect(Bunny).to receive(:new) do
         raise connection_error
-      end.exactly(subject.config.connection_retries + 1).times
+      end.exactly(subject.config.connection_attempts).times
 
       expect { subject.start_connection! }.to raise_error(Philotic::Connection::TCPConnectionFailed)
     end
@@ -147,7 +147,6 @@ describe Philotic::Connection do
         expect(queue).to receive(:delete)
         expect(channel).to receive(:queue).with(queue_name, queue_options).and_return(queue)
         expect(channel).to receive(:headers).with(config[:exchange], durable: true) { exchange }
-        expect(queue).to receive(:name).and_return(queue_name).exactly(2).times
 
         config[:bindings].each do |arguments|
           expect(queue).to receive(:bind).with(exchange, {arguments: arguments})
