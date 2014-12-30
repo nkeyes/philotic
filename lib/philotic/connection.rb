@@ -10,7 +10,13 @@ require 'philotic/subscriber'
 module Philotic
   class Connection
 
-    class TCPConnectionFailed < Bunny::TCPConnectionFailed; end
+    class TCPConnectionFailed < StandardError
+      attr_reader :url
+
+      def initialize(message, url)
+        super("Could not establish TCP connection to #{url}: #{message}")
+      end
+    end
 
     extend Forwardable
 
@@ -41,11 +47,11 @@ module Philotic
       start_connection!
 
       if connected?
-        logger.info "connected to RabbitMQ: #{config.rabbit_host}:#{config.rabbit_port}"
+        logger.info { "Connected to RabbitMQ: #{config.sanitized_rabbit_url}" }
         set_exchange_return_handler!
         true
       else
-        logger.error "failed connected to RabbitMQ; host:#{config.rabbit_host}"
+        logger.error { "Failed to connect to RabbitMQ: #{config.sanitized_rabbit_url}" }
         false
       end
     end
@@ -54,18 +60,23 @@ module Philotic
       begin
         attempt_connection
       rescue ::Bunny::TCPConnectionFailed => e
-        if connection_attempts <= config.connection_retries
+        if connection_attempts < config.connection_attempts
           retry
         else
-          raise TCPConnectionFailed.new "Failed to connect after #{connection_attempts} attempts", config.rabbit_host, config.rabbit_port
+          attempts             = connection_attempts
+          @connection_attempts = 0
+          raise TCPConnectionFailed.new "Failed to connect to RabbitMQ server after #{attempts} attempts", config.sanitized_rabbit_url
         end
       end
     end
 
     def attempt_connection
       @connection_attempts += 1
-      @connection          = Bunny.new(config.rabbit_url, connection_settings)
+      logger.warn { "Connecting to RabbitMQ: #{config.sanitized_rabbit_url}. Attempt #{connection_attempts} of #{config.connection_attempts}" } if connection_attempts > 1
+
+      @connection = Bunny.new(config.rabbit_url, connection_settings)
       @connection.start
+      @connection_attempts = 0
     end
 
     def connection_settings
@@ -77,7 +88,7 @@ module Philotic
     end
 
     def close
-      logger.info "closing connection to RabbitMQ; host:#{config.rabbit_host}"
+      logger.warn { "closing connection to RabbitMQ: #{config.sanitized_rabbit_url}" }
       connection.close if connected?
       @channel  = nil
       @exchange = nil
@@ -112,7 +123,7 @@ module Philotic
 
       if should_delete_queue
         channel.queue(queue_name, passive: true).delete
-        logger.info "deleted old queue. queue: #{queue_name}"
+        logger.info { "deleted old queue. queue: #{queue_name}" }
       end
 
       if should_create_queue
@@ -120,7 +131,7 @@ module Philotic
         queue  = queue_from_config(queue_name, config)
         bind_queue(queue, config)
       else
-        logger.warn "Queue #{queue_name} not created; it already exists. self.config.delete_existing_queues must be true to override."
+        logger.warn { "Queue #{queue_name} not created; it already exists. self.config.delete_existing_queues must be true to override." }
       end
     end
 
@@ -129,10 +140,10 @@ module Philotic
       bindings       = config[:bindings]
       bindings.each do |arguments|
         queue.bind(queue_exchange, {arguments: arguments})
-        logger.info "Added binding to queue. queue: #{queue.name} binding: #{arguments}"
+        logger.info { "Added binding to queue. queue: #{queue.name} binding: #{arguments}" }
       end
 
-      logger.info "Finished adding bindings to queue. queue: #{queue.name}"
+      logger.info { "Finished adding bindings to queue. queue: #{queue.name}" }
     end
 
     def exchange_from_config(config)
@@ -144,7 +155,7 @@ module Philotic
       queue_options.merge!(config[:options] || {})
 
       channel.queue(queue_name, queue_options).tap do
-        logger.info "Created queue. queue:#{queue_name}"
+        logger.info { "Created queue. queue:#{queue_name}" }
       end
     end
 
