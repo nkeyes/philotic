@@ -2,10 +2,10 @@
 
 Lightweight, opinionated wrapper for using RabbitMQ headers exchanges
 
-[![Code Climate](https://codeclimate.com/github/nkeyes/philotic/badges/gpa.svg)](https://codeclimate.com/github/nkeyes/philotic)
+[![Build Status](https://travis-ci.org/nkeyes/philotic.png?branch=master)](https://travis-ci.org/nkeyes/philotic)
 [![Gem Version](https://badge.fury.io/rb/philotic.png)](http://badge.fury.io/rb/philotic)
 [![Dependency Status](https://gemnasium.com/nkeyes/philotic.svg)](https://gemnasium.com/nkeyes/philotic)
-[![Build Status](https://travis-ci.org/nkeyes/philotic.png?branch=master)](https://travis-ci.org/nkeyes/philotic)
+[![Code Climate](https://codeclimate.com/github/nkeyes/philotic/badges/gpa.svg)](https://codeclimate.com/github/nkeyes/philotic)
 [![Test Coverage](https://codeclimate.com/github/nkeyes/philotic/badges/coverage.svg)](https://codeclimate.com/github/nkeyes/philotic)
 
 Check out the [examples](https://github.com/nkeyes/philotic/tree/master/examples).
