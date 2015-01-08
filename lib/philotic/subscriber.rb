@@ -36,16 +36,19 @@ module Philotic
       connection.connect!
       connection.channel.prefetch(connection.config.prefetch_count)
 
-      @exchange = connection.exchange
-
       subscription_settings = get_subscription_settings subscription, subscribe_options
 
-      queue = connection.channel.queue(subscription_settings[:queue_name], subscription_settings[:queue_options])
-
-      queue.bind(@exchange, arguments: subscription_settings[:arguments]) if subscription_settings[:arguments]
+      queue = initialize_queue(subscription_settings)
 
       queue.subscribe(subscription_settings[:subscribe_options], &subscription_callback(queue, &block))
 
+    end
+
+    def initialize_queue(subscription_settings)
+      queue = connection.channel.queue(subscription_settings[:queue_name], subscription_settings[:queue_options])
+
+      queue.bind(connection.exchange, arguments: subscription_settings[:arguments]) if subscription_settings[:arguments]
+      queue
     end
 
     def get_subscription_settings(subscription, subscribe_options)
