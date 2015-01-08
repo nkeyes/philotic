@@ -25,7 +25,8 @@ describe Philotic::Subscriber do
         expect(subject.connection).to receive(:connect!)
 
         expect(subject.connection).to receive(:exchange).and_return(exchange)
-        expect(subject.connection).to receive(:channel).and_return(channel)
+        expect(subject.connection).to receive(:channel).and_return(channel).twice
+        expect(channel).to receive(:prefetch).with(subject.connection.config.prefetch_count)
         expect(channel).to receive(:queue).and_return(queue)
 
         expect(queue).not_to receive(:bind)
@@ -57,7 +58,8 @@ describe Philotic::Subscriber do
         expect(subject.connection).to receive(:connect!)
 
         expect(subject.connection).to receive(:exchange).and_return(exchange)
-        expect(subject.connection).to receive(:channel).and_return(channel)
+        expect(subject.connection).to receive(:channel).and_return(channel).twice
+        expect(channel).to receive(:prefetch).with(subject.connection.config.prefetch_count)
         expect(channel).to receive(:queue).and_return(queue)
 
         expect(queue).to receive(:bind).with(exchange, hash_including(arguments: subscription))

@@ -82,7 +82,7 @@ module Philotic
     def connection_settings
       {
           timeout:                   config.timeout.to_i,
-          automatically_recover:     true,
+          automatic_recovery:        true,
           on_tcp_connection_failure: config.connection_failed_handler,
       }
     end
@@ -167,7 +167,7 @@ module Philotic
       @logger
     end
 
-    def_delegators :publisher, :publish
-    def_delegators :subscriber, :subscribe
+    def_delegators :publisher, *(Philotic::Publisher.public_instance_methods(false) - [:connection, :config, :logger])
+    def_delegators :subscriber, *(Philotic::Subscriber.public_instance_methods(false) - [:connection, :config, :logger])
   end
 end

@@ -66,9 +66,7 @@ describe Philotic::Publisher do
         subject.publish(event)
         expect(event).to_not be_published
       end
-
     end
-
   end
 
   describe '#raw_publish' do
@@ -82,9 +80,10 @@ describe Philotic::Publisher do
       expect(subject.connection).to receive(:connected?).and_return(true)
       metadata = {
           routing_key:      nil,
-          persistent:       true,
-          mandatory:        true,
-          content_type:     nil,
+          persistent:       false,
+          immediate:        false,
+          mandatory:        false,
+          content_type:     'application/json',
           content_encoding: nil,
           priority:         nil,
           message_id:       nil,
@@ -120,7 +119,6 @@ describe Philotic::Publisher do
 
     it 'should log an error when there is no connection' do
 
-
       expect(subject.connection).to receive(:connect!)
       expect(subject.connection).to receive(:connected?).once.and_return(false)
 
@@ -131,7 +129,6 @@ describe Philotic::Publisher do
     end
 
   end
-
 
   describe '#normalize_payload_times' do
     let(:responds_to_utc) { double }
@@ -153,6 +150,5 @@ describe Philotic::Publisher do
       expect(payload).to eq normalized_payload
 
     end
-
   end
 end

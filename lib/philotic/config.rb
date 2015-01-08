@@ -25,10 +25,10 @@ module Philotic
     DEFAULT_EXCHANGE_NAME           = 'philotic.headers'
     DEFAULT_TIMEOUT                 = 2
     DEFAULT_ROUTING_KEY             = nil
-    DEFAULT_PERSISTENT              = true
-    # DEFAULT_IMMEDIATE = false
-    DEFAULT_MANDATORY               = true
-    DEFAULT_CONTENT_TYPE            = nil
+    DEFAULT_PERSISTENT              = false
+    DEFAULT_IMMEDIATE               = false
+    DEFAULT_MANDATORY               = false
+    DEFAULT_CONTENT_TYPE            = 'application/json'
     DEFAULT_CONTENT_ENCODING        = nil
     DEFAULT_PRIORITY                = nil
     DEFAULT_MESSAGE_ID              = nil
@@ -40,6 +40,7 @@ module Philotic
     DEFAULT_TIMESTAMP               = nil
     DEFAULT_EXPIRATION              = nil
     DEFAULT_CONNECTION_ATTEMPTS     = 3
+    DEFAULT_PREFETCH_COUNT          = 1
 
     attr_accessor :connection
 
@@ -83,17 +84,21 @@ module Philotic
       @connection_retries ||= defaults[:connection_attempts].to_i
     end
 
+    def prefetch_count
+      @prefetch_count ||= defaults[:prefetch_count].to_i
+    end
+
     attr_writer :connection_failed_handler, :connection_loss_handler, :message_return_handler
 
     def connection_failed_handler
       @connection_failed_handler ||= lambda do |settings|
-        logger.error { "RabbitMQ connection failure; host:#{rabbit_host}" }
+        logger.error { "RabbitMQ connection failure: #{sanitized_rabbit_url}" }
       end
     end
 
     def connection_loss_handler
       @connection_loss_handler ||= lambda do |conn, settings|
-        logger.warn { "RabbitMQ connection loss; host:#{rabbit_host}" }
+        logger.warn { "RabbitMQ connection loss: #{sanitized_rabbit_url}" }
         conn.reconnect(false, 2)
       end
     end
