@@ -13,7 +13,7 @@ module Philotic
   MESSAGE_OPTIONS    = [
       :routing_key,
       :persistent,
-      # :immediate,
+      :immediate,
       :mandatory,
       :content_type,
       :content_encoding,

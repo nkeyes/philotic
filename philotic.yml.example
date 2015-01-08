@@ -11,9 +11,9 @@ defaults: &defaults
   
   #message settings
   routing_key: ~
-  persistent: true
-  # immediate: true
-  mandatory: true
+  persistent: false
+  immediate: false
+  mandatory: false
   content_type: ~
   content_encoding: ~
   priority: ~

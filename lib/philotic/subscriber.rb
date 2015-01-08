@@ -2,13 +2,6 @@ require 'philotic/constants'
 
 module Philotic
   class Subscriber
-    class Metadata
-      attr_accessor :attributes
-
-      def initialize(attributes)
-        self.attributes = attributes
-      end
-    end
 
     attr_accessor :connection
 
@@ -20,7 +13,11 @@ module Philotic
       connection.logger
     end
 
-    def subscription_callback(&block)
+    def config
+      connection.config
+    end
+
+    def subscription_callback(queue, &block)
       lambda do |delivery_info, metadata, payload|
         hash_payload = JSON.parse payload
 
@@ -31,22 +28,27 @@ module Philotic
             attributes:    metadata[:headers] ? hash_payload.merge(metadata[:headers]) : hash_payload
         }
 
-        instance_exec(Metadata.new(metadata), event, &block)
+        instance_exec(event, metadata, queue, &block)
       end
     end
 
     def subscribe(subscription = {}, subscribe_options = Philotic::DEFAULT_SUBSCRIBE_OPTIONS, &block)
       connection.connect!
-      @exchange = connection.exchange
+      connection.channel.prefetch(connection.config.prefetch_count)
 
       subscription_settings = get_subscription_settings subscription, subscribe_options
 
-      q = connection.channel.queue(subscription_settings[:queue_name], subscription_settings[:queue_options])
+      queue = initialize_queue(subscription_settings)
 
-      q.bind(@exchange, arguments: subscription_settings[:arguments]) if subscription_settings[:arguments]
+      queue.subscribe(subscription_settings[:subscribe_options], &subscription_callback(queue, &block))
 
-      q.subscribe(subscription_settings[:subscribe_options], &subscription_callback(&block))
+    end
 
+    def initialize_queue(subscription_settings)
+      queue = connection.channel.queue(subscription_settings[:queue_name], subscription_settings[:queue_options])
+
+      queue.bind(connection.exchange, arguments: subscription_settings[:arguments]) if subscription_settings[:arguments]
+      queue
     end
 
     def get_subscription_settings(subscription, subscribe_options)
