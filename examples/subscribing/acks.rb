@@ -6,19 +6,19 @@ require 'philotic'
 require 'awesome_print'
 
 # sometimes ack
-Philotic.subscribe('flaky_queue', ack: true) do |metadata, message|
+Philotic.subscribe('flaky_queue', ack: true) do |message, metadata, queue|
   ap message[:attributes]
    [true, false].sample ? acknowledge(message) : reject(message)
 end
 
 # always ack
-Philotic.subscribe('flaky_queue', ack: true) do |metadata, message|
+Philotic.subscribe('flaky_queue', ack: true) do |message, metadata, queue|
   ap message[:attributes]
   acknowledge(message, true)
 end
 
 # always reject
-Philotic.subscribe('flaky_queue', ack: true) do |metadata, message|
+Philotic.subscribe('flaky_queue', ack: true) do |message, metadata, queue|
   ap message[:attributes]
   reject message
 end
