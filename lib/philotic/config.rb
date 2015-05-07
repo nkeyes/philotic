@@ -40,7 +40,7 @@ module Philotic
     DEFAULT_TIMESTAMP               = nil
     DEFAULT_EXPIRATION              = nil
     DEFAULT_CONNECTION_ATTEMPTS     = 3
-    DEFAULT_PREFETCH_COUNT          = 1
+    DEFAULT_PREFETCH_COUNT          = 0
 
     attr_accessor :connection
 
