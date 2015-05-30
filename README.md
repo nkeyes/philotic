@@ -68,11 +68,10 @@ end
 ```
 
 ### Tested with the following Rubies
-* 1.9.3
 * 2.0.0
-* 2.1.0
-* rbx-2.2.10
-* rbx-2.3.0
+* 2.1.x
+* 2.2.x
+* rbx-2
 * jruby-19mode
 * ruby-head
 * jruby-head
