@@ -72,6 +72,4 @@ end
 * 2.1.x
 * 2.2.x
 * rbx-2
-* jruby-19mode
 * ruby-head
-* jruby-head

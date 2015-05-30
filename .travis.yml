@@ -4,9 +4,9 @@ rvm:
 - 2.1
 - 2.2
 - rbx-2
-- jruby-19mode
+# - jruby-19mode
 - ruby-head
-- jruby-head
+# - jruby-head
 script:
 - bundle exec rspec
 addons:
