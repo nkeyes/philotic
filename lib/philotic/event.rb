@@ -1,18 +1,36 @@
 require 'philotic/constants'
-require 'philotic/routable'
 require 'philotic/singleton'
 
 module Philotic
   class Event
-    include Philotic::Routable
 
-    attr_accessor :connection, :publish_error
+    attr_accessor :connection, :publish_error, :delivery_info
     attr_writer :published
+
+    class << self
+      def attr_routable_accessors
+        @attr_routable_accessors ||= Set.new
+      end
+
+      def attr_payload_accessors
+        @attr_payload_accessors ||= Set.new
+      end
+
+      def attr_routable(*names)
+        attr_routable_accessors.merge(names)
+        attr_accessor(*names)
+      end
+
+      def attr_payload(*names)
+        attr_payload_accessors.merge(names)
+        attr_accessor(*names)
+      end
+    end
 
     def initialize(routables={}, payloads={}, connection=nil)
       self.timestamp         = Time.now.to_i
       self.philotic_firehose = true
-      self.connection = connection
+      self.connection        = connection
 
       # dynamically insert any passed in routables into both attr_routable
       # and attr_payload
@@ -24,17 +42,10 @@ module Philotic
       @published = false
     end
 
-    def self.inherited(sub)
-      Philotic::PHILOTIC_HEADERS.each do |header|
-        sub.attr_routable header
-      end
-      self.attr_routable_readers.dup.each do |routable|
-        sub.attr_routable routable
-      end
-
-      self.attr_payload_readers.dup.each do |payload|
-        sub.attr_payload payload
-      end
+    def self.inherited(sub_class)
+      sub_class.attr_routable(*Philotic::PHILOTIC_HEADERS)
+      sub_class.attr_routable(*self.attr_routable_accessors.dup)
+      sub_class.attr_payload(*self.attr_payload_accessors.dup)
     end
 
     self.inherited(self)
@@ -43,7 +54,7 @@ module Philotic
       attr_reader message_option
       define_method :"#{message_option}=" do |val|
         instance_variable_set(:"@#{message_option}", val)
-        self.message_metadata[message_option] = val
+        self.metadata[message_option] = val
       end
     end
 
@@ -52,7 +63,7 @@ module Philotic
     end
 
     def published?
-     !!@published
+      !!@published
     end
 
     def publish
@@ -63,7 +74,41 @@ module Philotic
       self.new(*args).publish
     end
 
+    def delivery_tag
+      delivery_info.try(:delivery_tag)
+    end
+
+    def payload
+      _payload_or_headers(:payload)
+    end
+
+    def headers
+      _payload_or_headers(:routable)
+    end
+
+    def attributes
+      payload.merge headers
+    end
+
+    def metadata
+      @metadata ||= {}
+    end
+
+    def metadata=(options)
+      @metadata ||= {}
+      @metadata.merge! options
+    end
+
     private
+
+    def _payload_or_headers(payload_or_headers)
+      attribute_hash = {}
+      self.class.send("attr_#{payload_or_headers}_accessors").each do |attr|
+        attr                 = attr.to_sym
+        attribute_hash[attr] = send(attr)
+      end
+      attribute_hash
+    end
 
     def _set_routables_or_payloads(type, attrs)
       attrs.each do |key, value|
@@ -76,25 +121,26 @@ module Philotic
     end
 
     def _set_event_attribute(type, key, value)
-      _set_event_attribute_setter(key, type, value)
-      _set_event_attribute_getter(key, type)
+      self.class.send("attr_#{type}_accessors").merge([key])
+      _set_event_attribute_accessor(key, value)
     end
 
-    def _set_event_attribute_getter(key, type)
-      self.class.send("attr_#{type}_readers").concat([key])
-      getter = lambda do
-        instance_variable_get(:"@#{key}")
-      end
-      self.class.send :define_method, :"#{key}", getter
+    def _set_event_attribute_accessor(attr, value)
+      _set_event_attribute_getter(attr)
+      _set_event_attribute_setter(attr)
+      self.send(:"#{attr}=", value)
     end
 
-    def _set_event_attribute_setter(key, type, value)
-      self.class.send("attr_#{type}_writers").concat([:"#{key}="])
-      setter = lambda do |v|
-        instance_variable_set(:"@#{key}", v)
+    def _set_event_attribute_getter(attr)
+      self.define_singleton_method :"#{attr}" do
+        instance_variable_get(:"@#{attr}")
       end
-      self.class.send :define_method, :"#{key}=", setter
-      self.send(:"#{key}=", value)
+    end
+
+    def _set_event_attribute_setter(attr)
+      self.define_singleton_method :"#{attr}=" do |v|
+        instance_variable_set(:"@#{attr}", v)
+      end
     end
   end
 end

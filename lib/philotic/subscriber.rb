@@ -17,18 +17,14 @@ module Philotic
       connection.config
     end
 
-    def subscription_callback(queue, &block)
+    def subscription_callback(&block)
       lambda do |delivery_info, metadata, payload|
         hash_payload = JSON.parse payload
 
-        event = {
-            payload:       hash_payload,
-            headers:       metadata[:headers],
-            delivery_info: delivery_info,
-            attributes:    metadata[:headers] ? hash_payload.merge(metadata[:headers]) : hash_payload
-        }
+        event = Philotic::Event.new(metadata[:headers], hash_payload)
+        event.delivery_info = delivery_info
 
-        instance_exec(event, metadata, queue, &block)
+        instance_exec(event, &block)
       end
     end
 
@@ -40,7 +36,7 @@ module Philotic
 
       queue = initialize_queue(subscription_settings)
 
-      queue.subscribe(subscription_settings[:subscribe_options], &subscription_callback(queue, &block))
+      queue.subscribe(subscription_settings[:subscribe_options], &subscription_callback(&block))
 
     end
 
@@ -78,12 +74,12 @@ module Philotic
       }
     end
 
-    def acknowledge(message, up_to_and_including=false)
-      connection.channel.acknowledge(message[:delivery_info].delivery_tag, up_to_and_including)
+    def acknowledge(event, up_to_and_including=false)
+      connection.channel.acknowledge(event.delivery_tag, up_to_and_including)
     end
 
-    def reject(message, requeue=true)
-      connection.channel.reject(message[:delivery_info].delivery_tag, requeue)
+    def reject(event, requeue=true)
+      connection.channel.reject(event.delivery_tag, requeue)
     end
 
     def subscribe_to_any(options = {})

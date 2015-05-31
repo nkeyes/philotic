@@ -1,16 +1,52 @@
 require 'spec_helper'
-
+require 'philotic/event'
 # create 'deep' inheritance to test self.inherited
 class TestEventParent < Philotic::Event
 end
 class TestEvent < TestEventParent
+  attr_routable :routable_attr
+  attr_payload :payload_attr
 end
 
 describe Philotic::Event do
   let(:event) { TestEvent.new }
   subject { event }
 
-  Philotic::Routable::ClassMethods.instance_methods.sort.each do |method_name|
+  %w[
+      attr_routable_accessors
+      attr_routable
+      attr_payload_accessors
+      attr_payload
+  ].each do |method_name|
+    specify { expect(subject.class.methods).to include method_name.to_sym }
+  end
+
+  it 'should have proper headers' do
+    expect(subject.headers).to include({routable_attr: nil})
+  end
+
+  it 'should have proper payload' do
+    expect(subject.payload).to eq({payload_attr: nil})
+  end
+
+  it 'should have proper attributes' do
+    expect(subject.attributes).to include({routable_attr: nil, payload_attr: nil})
+  end
+
+  it 'should have empty metadata, other than timestamp' do
+    expect(subject.metadata.keys).to eq([:timestamp])
+  end
+
+  context 'overriding a value with metadata=' do
+    before do
+      subject.metadata = {mandatory: false}
+    end
+    it 'should work' do
+      expect(subject.metadata).to include({mandatory: false})
+    end
+  end
+
+  Philotic::Event.methods.sort.each do |method_name|
     specify { expect(subject.class.methods).to include method_name.to_sym }
   end
 
@@ -24,16 +60,16 @@ describe Philotic::Event do
     specify { expect(subject.methods).to include "#{method_name}=".to_sym }
   end
 
-  describe 'message_metadata' do
+  describe 'metadata' do
     it 'should have a timestamp' do
       Timecop.freeze
-      expect(subject.message_metadata).to eq(timestamp: Time.now.to_i)
+      expect(subject.metadata).to eq(timestamp: Time.now.to_i)
     end
 
     it 'should reflect changes in the event properties' do
-      expect(subject.message_metadata[:app_id]).to eq nil
+      expect(subject.metadata[:app_id]).to eq nil
       subject.app_id = 'ANSIBLE'
-      expect(subject.message_metadata[:app_id]).to eq 'ANSIBLE'
+      expect(subject.metadata[:app_id]).to eq 'ANSIBLE'
     end
   end
   describe 'headers' do
@@ -45,17 +81,17 @@ describe Philotic::Event do
   context 'generic event' do
     let(:headers) do
       {
-          header1: 'h1',
-          header2: 'h2',
-          header3: 'h3',
+        header1: 'h1',
+        header2: 'h2',
+        header3: 'h3',
       }
     end
 
     let(:payloads) do
       {
-          payload1: 'h1',
-          payload2: 'h2',
-          payload3: 'h3',
+        payload1: 'h1',
+        payload2: 'h2',
+        payload3: 'h3',
       }
     end
     it 'builds an event with dynamic headers and payloads' do
@@ -81,17 +117,17 @@ describe Philotic::Event do
     let (:connection) { double }
     let(:headers) do
       {
-          header1: 'h1',
-          header2: 'h2',
-          header3: 'h3',
+        header1: 'h1',
+        header2: 'h2',
+        header3: 'h3',
       }
     end
 
     let(:payloads) do
       {
-          payload1: 'h1',
-          payload2: 'h2',
-          payload3: 'h3',
+        payload1: 'h1',
+        payload2: 'h2',
+        payload3: 'h3',
       }
     end
     subject { Philotic::Event }

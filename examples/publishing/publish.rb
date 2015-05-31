@@ -18,8 +18,8 @@ Philotic.logger.level = Logger::WARN
 @event.subject   = 'Hey'
 @event.available = true
 
-@event.message_metadata = {mandatory: true}
-@event.message_metadata = {app_id: 'PHX'}
+@event.metadata = {mandatory: true}
+@event.metadata = {app_id: 'PHX'}
 
 def send_message number
   @event.gender  = [:F, :M].sample
@@ -35,5 +35,5 @@ loop do
   send_message i
   print "Message rate: #{(i/(Time.now - start)).round(2)}/sec          \r"
   i+= 1
-  sleep 0.01
+  sleep 0.001
 end

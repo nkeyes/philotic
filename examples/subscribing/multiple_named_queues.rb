@@ -7,12 +7,12 @@ require 'awesome_print'
 
 Philotic.config.load_file(File.join(File.dirname(__FILE__), '../../', 'Philotic.yml.example'))
 
-Philotic.subscribe('female_queue') do |message, metadata, queue|
-  ap message[:attributes]
+Philotic.subscribe('female_queue') do |event|
+  ap event.attributes
 end
 
-Philotic.subscribe('male_queue') do |message, metadata, queue|
-  ap message[:attributes]
+Philotic.subscribe('male_queue') do |event|
+  ap event.attributes
 end
 
 Philotic.subscriber.endure

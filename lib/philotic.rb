@@ -1,4 +1,3 @@
-require 'active_support/all'
 require 'pathname'
 
 module Philotic
@@ -16,7 +15,6 @@ require 'philotic/singleton'
 require 'philotic/connection'
 require 'philotic/version'
 require 'philotic/config'
-require 'philotic/routable'
 require 'philotic/event'
 require 'philotic/publisher'
 require 'philotic/subscriber'

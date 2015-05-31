@@ -91,11 +91,12 @@ describe Philotic::Subscriber do
     let(:channel) { double }
     let(:delivery_tag) { double }
     let(:delivery_info) { double }
-    let(:message) { {delivery_info: delivery_info} }
+    let(:message) { Philotic::Event.new }
     subject { Philotic::Connection.new.subscriber }
 
     specify do
       expect(subject.connection).to receive(:channel).and_return(channel)
+      expect(message).to receive(:delivery_info).and_return(delivery_info)
       expect(delivery_info).to receive(:delivery_tag).and_return(delivery_tag)
       expect(channel).to receive(:acknowledge).with(delivery_tag, false)
       subject.acknowledge(message)
@@ -106,11 +107,12 @@ describe Philotic::Subscriber do
     let(:channel) { double }
     let(:delivery_tag) { double }
     let(:delivery_info) { double }
-    let(:message) { {delivery_info: delivery_info} }
+    let(:message) { Philotic::Event.new }
     subject { Philotic::Connection.new.subscriber }
 
     specify do
       expect(subject.connection).to receive(:channel).and_return(channel)
+      expect(message).to receive(:delivery_info).and_return(delivery_info)
       expect(delivery_info).to receive(:delivery_tag).and_return(delivery_tag)
       expect(channel).to receive(:reject).with(delivery_tag, true)
       subject.reject(message)

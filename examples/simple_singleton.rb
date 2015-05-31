@@ -10,8 +10,8 @@ Philotic.config.message_return_handler = lambda do |basic_return, metadata, mess
   Philotic.logger.warn { "Message returned. reply_text: #{basic_return.reply_text}" }
 end
 
-Philotic.subscribe(header_key: 'header_1') do |message, metadata, queue|
-  ap message[:attributes]
+Philotic.subscribe(header_key: 'header_1') do |event|
+  ap header_key: event.header_key, payload_key: event.payload_key, methods: event.methods - Philotic::Event.new.methods
 end
 
 # normally we'd do:

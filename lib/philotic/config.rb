@@ -144,7 +144,7 @@ module Philotic
 
     def load_file(filename, env = 'development')
       config = YAML.load_file(filename)
-      load(config[env])
+      load_config(config[env])
     end
   end
 end

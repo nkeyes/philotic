@@ -26,7 +26,6 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'simplecov'
 
   gem.add_dependency 'activesupport', '>= 3.2'
-  gem.add_dependency 'activerecord', '>= 3.2'
   gem.add_dependency 'awesome_print', '>= 1.2'
   gem.add_dependency 'bunny', '>= 1.6'
   gem.add_dependency 'json', '>= 1.8'
