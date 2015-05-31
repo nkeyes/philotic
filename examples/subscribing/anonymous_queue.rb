@@ -7,8 +7,8 @@ require 'awesome_print'
 
 Philotic.config.load_file(File.join(File.dirname(__FILE__), '../../', 'Philotic.yml.example'))
 
-Philotic.subscribe(philotic_firehose: true) do |event|
-  ap event.attributes
+Philotic.subscribe(philotic_firehose: true) do |message|
+  ap message.attributes
 end
 
 Philotic.subscriber.endure

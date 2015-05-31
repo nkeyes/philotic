@@ -31,7 +31,7 @@ end
 # to keep the parent thread alive while the subscribers do their thing
 # but this infinite publish loop takes care of that
 loop do
-  Philotic::Event.publish({header_key: "header_#{[1, 2].sample}"}, {payload_key: 'payload_value'})
+  Philotic::Message.publish({header_key: "header_#{[1, 2].sample}"}, {payload_key: 'payload_value'})
   # only send a message every two seconds so we can see whats going on
   sleep 2
 end
@@ -60,8 +60,8 @@ end
 # to keep the parent thread alive while the subscribers do their thing
 # but this infinite publish loop takes care of that
 loop do
-  event = Philotic::Event.new({header_key: "header_#{[1, 2].sample}"}, {payload_key: 'payload_value'})
-  philotic.publish event
+  message = Philotic::Message.new({header_key: "header_#{[1, 2].sample}"}, {payload_key: 'payload_value'})
+  philotic.publish message
   # only send a message every two seconds so we can see whats going on
   sleep 2
 end

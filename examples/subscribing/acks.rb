@@ -6,20 +6,20 @@ require 'philotic'
 require 'awesome_print'
 
 # sometimes ack
-Philotic.subscribe('flaky_queue', ack: true) do |event|
-  ap event.attributes
-   [true, false].sample ? acknowledge(event) : reject(event)
+Philotic.subscribe('flaky_queue', ack: true) do |message|
+  ap message.attributes
+   [true, false].sample ? acknowledge(message) : reject(message)
 end
 
 # always ack
-Philotic.subscribe('flaky_queue', ack: true) do |event|
-  ap event.attributes
-  acknowledge(event, true)
+Philotic.subscribe('flaky_queue', ack: true) do |message|
+  ap message.attributes
+  acknowledge(message, true)
 end
 
 # always reject
-Philotic.subscribe('flaky_queue', ack: true) do |event|
-  ap event.attributes
-  reject event
+Philotic.subscribe('flaky_queue', ack: true) do |message|
+  ap message.attributes
+  reject message
 end
 Philotic.subscriber.endure

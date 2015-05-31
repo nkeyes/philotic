@@ -3,29 +3,29 @@ $:.unshift File.expand_path('../../../lib', __FILE__)
 $stdout.sync = true
 
 require 'philotic'
-require 'philotic/dummy_event'
+require 'philotic/dummy_message'
 
 
 Philotic.logger.level = Logger::WARN
 
-@event = Philotic::DummyEvent.new
+@message = Philotic::DummyMessage.new
 
-@event.philotic_firehose   = true
-@event.philotic_product    = 'rabbit'
-@event.philotic_component  = 'speed_test'
-@event.philotic_event_type = 'ping'
+@message.philotic_firehose   = true
+@message.philotic_product    = 'rabbit'
+@message.philotic_component  = 'speed_test'
+@message.philotic_message_type = 'ping'
 
-@event.subject   = 'Hey'
-@event.available = true
+@message.subject   = 'Hey'
+@message.available = true
 
-@event.metadata = {mandatory: true}
-@event.metadata = {app_id: 'PHX'}
+@message.metadata = {mandatory: true}
+@message.metadata = {app_id: 'PHX'}
 
 def send_message number
-  @event.gender  = [:F, :M].sample
-  @event.message = "Message #{number}: Hey #{@event.gender == :M ? 'dude' : 'dudette'}"
+  @message.gender  = [:F, :M].sample
+  @message.message = "Message #{number}: Hey #{@message.gender == :M ? 'dude' : 'dudette'}"
 
-  Philotic.publish @event
+  Philotic.publish @message
 
 end
 

@@ -1,17 +1,17 @@
 require 'spec_helper'
-require 'philotic/dummy_event'
+require 'philotic/dummy_message'
 require 'philotic/connection'
 require 'philotic/publisher'
 
 describe Philotic::Publisher do
-  let(:event) do
-    event           = Philotic::DummyEvent.new
-    event.subject   = 'Hello'
-    event.message   = 'How are you?'
-    event.gender    = :M
-    event.available = true
+  let(:message) do
+    message           = Philotic::DummyMessage.new
+    message.subject   = 'Hello'
+    message.message   = 'How are you?'
+    message.gender    = :M
+    message.available = true
 
-    event
+    message
   end
   let(:publisher) { Philotic::Connection.new.publisher }
   subject { publisher }
@@ -30,16 +30,16 @@ describe Philotic::Publisher do
                                      philotic_firehose:   true,
                                      philotic_product:    nil,
                                      philotic_component:  nil,
-                                     philotic_event_type: nil,
+                                     philotic_message_type: nil,
                                      gender:              :M,
                                      available:           true
                                  },
                                  timestamp: Time.now.to_i
                              }
                          )
-      expect(event).to_not be_published
-      subject.publish(event)
-      expect(event).to_not be_published # not connected
+      expect(message).to_not be_published
+      subject.publish(message)
+      expect(message).to_not be_published # not connected
     end
 
     it 'should fail gracefully' do
@@ -48,10 +48,10 @@ describe Philotic::Publisher do
       end
 
       expect(subject.logger).to receive(:error).with(publish_error.message)
-      expect(event).to_not be_published
-      subject.publish(event)
-      expect(event).to_not be_published
-      expect(event.publish_error).to eq publish_error
+      expect(message).to_not be_published
+      subject.publish(message)
+      expect(message).to_not be_published
+      expect(message.publish_error).to eq publish_error
 
     end
 
@@ -60,11 +60,11 @@ describe Philotic::Publisher do
         subject.config.disable_publish = true
       end
       it 'should log a warning' do
-        expect(subject).to receive(:log_event_published)
+        expect(subject).to receive(:log_message_published)
 
-        expect(event).to_not be_published
-        subject.publish(event)
-        expect(event).to_not be_published
+        expect(message).to_not be_published
+        subject.publish(message)
+        expect(message).to_not be_published
       end
     end
   end
@@ -97,7 +97,7 @@ describe Philotic::Publisher do
               philotic_firehose:   true,
               philotic_product:    nil,
               philotic_component:  nil,
-              philotic_event_type: nil,
+              philotic_message_type: nil,
               gender:              :M,
               available:           true
           },
@@ -112,9 +112,9 @@ describe Philotic::Publisher do
                               }.to_json,
                               metadata
                           )
-      expect(event).to_not be_published
-      subject.publish(event)
-      expect(event).to be_published
+      expect(message).to_not be_published
+      subject.publish(message)
+      expect(message).to be_published
     end
 
     it 'should log an error when there is no connection' do
@@ -123,9 +123,9 @@ describe Philotic::Publisher do
       expect(subject.connection).to receive(:connected?).once.and_return(false)
 
       expect(subject.logger).to receive(:error)
-      expect(event).to_not be_published
-      subject.publish(event)
-      expect(event).to_not be_published
+      expect(message).to_not be_published
+      subject.publish(message)
+      expect(message).to_not be_published
     end
 
   end

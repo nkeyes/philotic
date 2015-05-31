@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'philotic/dummy_event'
+require 'philotic/dummy_message'
 require 'philotic/connection'
 require 'philotic/constants'
 require 'philotic/subscriber'
@@ -91,7 +91,7 @@ describe Philotic::Subscriber do
     let(:channel) { double }
     let(:delivery_tag) { double }
     let(:delivery_info) { double }
-    let(:message) { Philotic::Event.new }
+    let(:message) { Philotic::Message.new }
     subject { Philotic::Connection.new.subscriber }
 
     specify do
@@ -107,7 +107,7 @@ describe Philotic::Subscriber do
     let(:channel) { double }
     let(:delivery_tag) { double }
     let(:delivery_info) { double }
-    let(:message) { Philotic::Event.new }
+    let(:message) { Philotic::Message.new }
     subject { Philotic::Connection.new.subscriber }
 
     specify do

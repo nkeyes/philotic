@@ -2,7 +2,7 @@ require 'philotic/constants'
 require 'philotic/singleton'
 
 module Philotic
-  class Event
+  class Message
 
     attr_accessor :connection, :publish_error, :delivery_info
     attr_writer :published
@@ -114,30 +114,30 @@ module Philotic
       attrs.each do |key, value|
         if self.respond_to?(:"#{key}=")
           send(:"#{key}=", value)
-        elsif self.class == Philotic::Event
-          _set_event_attribute(type, key, value)
+        elsif self.class == Philotic::Message
+          _set_message_attribute(type, key, value)
         end
       end
     end
 
-    def _set_event_attribute(type, key, value)
+    def _set_message_attribute(type, key, value)
       self.class.send("attr_#{type}_accessors").merge([key])
-      _set_event_attribute_accessor(key, value)
+      _set_message_attribute_accessor(key, value)
     end
 
-    def _set_event_attribute_accessor(attr, value)
-      _set_event_attribute_getter(attr)
-      _set_event_attribute_setter(attr)
+    def _set_message_attribute_accessor(attr, value)
+      _set_message_attribute_getter(attr)
+      _set_message_attribute_setter(attr)
       self.send(:"#{attr}=", value)
     end
 
-    def _set_event_attribute_getter(attr)
+    def _set_message_attribute_getter(attr)
       self.define_singleton_method :"#{attr}" do
         instance_variable_get(:"@#{attr}")
       end
     end
 
-    def _set_event_attribute_setter(attr)
+    def _set_message_attribute_setter(attr)
       self.define_singleton_method :"#{attr}=" do |v|
         instance_variable_set(:"@#{attr}", v)
       end

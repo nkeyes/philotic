@@ -1,16 +1,16 @@
 require 'spec_helper'
-require 'philotic/event'
+require 'philotic/message'
 # create 'deep' inheritance to test self.inherited
-class TestEventParent < Philotic::Event
+class TestEventParent < Philotic::Message
 end
 class TestEvent < TestEventParent
   attr_routable :routable_attr
   attr_payload :payload_attr
 end
 
-describe Philotic::Event do
-  let(:event) { TestEvent.new }
-  subject { event }
+describe Philotic::Message do
+  let(:message) { TestEvent.new }
+  subject { message }
 
   %w[
       attr_routable_accessors
@@ -46,7 +46,7 @@ describe Philotic::Event do
     end
   end
 
-  Philotic::Event.methods.sort.each do |method_name|
+  Philotic::Message.methods.sort.each do |method_name|
     specify { expect(subject.class.methods).to include method_name.to_sym }
   end
 
@@ -66,7 +66,7 @@ describe Philotic::Event do
       expect(subject.metadata).to eq(timestamp: Time.now.to_i)
     end
 
-    it 'should reflect changes in the event properties' do
+    it 'should reflect changes in the message properties' do
       expect(subject.metadata[:app_id]).to eq nil
       subject.app_id = 'ANSIBLE'
       expect(subject.metadata[:app_id]).to eq 'ANSIBLE'
@@ -78,7 +78,7 @@ describe Philotic::Event do
     end
   end
 
-  context 'generic event' do
+  context 'generic message' do
     let(:headers) do
       {
         header1: 'h1',
@@ -94,17 +94,17 @@ describe Philotic::Event do
         payload3: 'h3',
       }
     end
-    it 'builds an event with dynamic headers and payloads' do
-      event = Philotic::Event.new(headers, payloads)
+    it 'builds an message with dynamic headers and payloads' do
+      message = Philotic::Message.new(headers, payloads)
 
-      expect(event.headers).to include(headers)
-      expect(event.payload).to eq payloads
+      expect(message.headers).to include(headers)
+      expect(message.payload).to eq payloads
 
     end
   end
 
   describe '#publish' do
-    subject { Philotic::Event.new }
+    subject { Philotic::Message.new }
     specify do
       expect(subject.connection).to receive(:publish).with(subject)
 
@@ -130,12 +130,12 @@ describe Philotic::Event do
         payload3: 'h3',
       }
     end
-    subject { Philotic::Event }
+    subject { Philotic::Message }
     specify do
-      expect_any_instance_of(Philotic::Event).to receive(:connection).and_return(connection)
-      expect(connection).to receive(:publish) do |event|
-        expect(event.headers).to include(headers)
-        expect(event.payload).to eq payloads
+      expect_any_instance_of(Philotic::Message).to receive(:connection).and_return(connection)
+      expect(connection).to receive(:publish) do |message|
+        expect(message.headers).to include(headers)
+        expect(message.payload).to eq payloads
       end
 
       subject.publish(headers, payloads)

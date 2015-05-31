@@ -1,7 +1,7 @@
-require 'philotic/event'
+require 'philotic/message'
 
 module Philotic
-  class DummyEvent < Philotic::Event
+  class DummyMessage < Philotic::Message
     attr_payload :subject
     attr_payload :message
     attr_routable :gender

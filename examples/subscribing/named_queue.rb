@@ -5,8 +5,8 @@ $stdout.sync = true
 require 'philotic'
 require 'awesome_print'
 
-Philotic.subscribe('test_queue') do |event|
-  ap event.attributes
+Philotic.subscribe('test_queue') do |message|
+  ap message.attributes
 end
 
 Philotic.subscriber.endure
