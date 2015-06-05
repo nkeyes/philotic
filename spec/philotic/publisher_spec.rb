@@ -1,4 +1,5 @@
 require 'spec_helper'
+
 require 'philotic/dummy_message'
 require 'philotic/connection'
 require 'philotic/publisher'
@@ -8,7 +9,7 @@ describe Philotic::Publisher do
     message           = Philotic::DummyMessage.new
     message.subject   = 'Hello'
     message.message   = 'How are you?'
-    message.gender    = :M
+    message.hue       = :M
     message.available = true
 
     message
@@ -27,12 +28,12 @@ describe Philotic::Publisher do
                              },
                              {
                                  headers:   {
-                                     philotic_firehose:   true,
-                                     philotic_product:    nil,
-                                     philotic_component:  nil,
+                                     philotic_firehose:     true,
+                                     philotic_product:      nil,
+                                     philotic_component:    nil,
                                      philotic_message_type: nil,
-                                     gender:              :M,
-                                     available:           true
+                                     hue:                   :M,
+                                     available:             true,
                                  },
                                  timestamp: Time.now.to_i
                              }
@@ -94,12 +95,12 @@ describe Philotic::Publisher do
           app_id:           nil,
           expiration:       nil,
           headers:          {
-              philotic_firehose:   true,
-              philotic_product:    nil,
-              philotic_component:  nil,
+              philotic_firehose:     true,
+              philotic_product:      nil,
+              philotic_component:    nil,
               philotic_message_type: nil,
-              gender:              :M,
-              available:           true
+              hue:                   :M,
+              available:             true,
           },
           timestamp:        Time.now.to_i
       }

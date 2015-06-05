@@ -22,8 +22,8 @@ Philotic.logger.level = Logger::WARN
 @message.metadata = {app_id: 'PHX'}
 
 def send_message number
-  @message.gender  = [:F, :M].sample
-  @message.message = "Message #{number}: Hey #{@message.gender == :M ? 'dude' : 'dudette'}"
+  @message.hue  = [:F, :M].sample
+  @message.message = "Message #{number}: Hue - #{@message.hue == :M ? 'mauve' : 'fuchsia'}"
 
   Philotic.publish @message
 
