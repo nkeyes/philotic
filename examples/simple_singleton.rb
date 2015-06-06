@@ -11,7 +11,7 @@ Philotic.config.message_return_handler = lambda do |basic_return, metadata, mess
 end
 
 Philotic.subscribe(header_key: 'header_1') do |message|
-  ap header_key: message.header_key, payload_key: message.payload_key, methods: message.methods - Philotic::Message.new.methods
+  ap message.attributes
 end
 
 # normally we'd do:
@@ -23,5 +23,5 @@ end
 loop do
   Philotic::Message.publish({header_key: "header_#{[1, 2].sample}"}, {payload_key: 'payload_value'})
   # only send a message every two seconds so we can see whats going on
-  sleep 2
+  sleep 0.1
 end

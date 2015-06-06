@@ -10,16 +10,16 @@ class NamedQueueConsumer < Philotic::Consumer
   # subscribe to an existing named queue
   subscribe_to :test_queue
 
-  #use acknowledgements
-  ack_messages
+  # use acknowledgements
+  auto_acknowledge
 
   # REQUEUE the message with RabbitMQ if consume throws these errors. I.e., something went wrong with the consumer
   # Only valid with ack_messages
-  requeueable_errors PossiblyTransientErrorOne, PossiblyTransientErrorTwo
+  # requeueable_errors PossiblyTransientErrorOne, PossiblyTransientErrorTwo
 
   # REJECT the message with RabbitMQ if consume throws these errors. I.e., The message is malformed/invalid
   # Only valid with ack_messages
-  rejectable_errors BadMessageError
+  # rejectable_errors BadMessageError
 
   def consume(message)
     ap named: message.attributes

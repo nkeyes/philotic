@@ -27,11 +27,19 @@ describe Philotic::Consumer do
     end
   end
 
-  describe '.ack_messages' do
-    it 'sets the class variable @ack_messages' do
-      expect(subject.ack_messages?).not_to be true
-      subject.ack_messages
-      expect(subject.ack_messages?).to be true
+  describe '.manually_acknowledge' do
+    it 'sets the class variable @manually_acknowledge' do
+      expect(subject).not_to be_manually_acknowledge
+      subject.manually_acknowledge
+      expect(subject).to be_manually_acknowledge
+    end
+  end
+
+  describe '.auto_acknowledge' do
+    it 'sets the class variable @auto_acknowledge' do
+      expect(subject).not_to be_auto_acknowledge
+      subject.auto_acknowledge
+      expect(subject).to be_auto_acknowledge
     end
   end
 
@@ -91,7 +99,13 @@ describe Philotic::Consumer do
     it 'returns a hash with the exclusive and manual_ack options' do
       expect(subject.subscription_options).to match({manual_ack: false, exclusive: false})
 
-      subject.ack_messages
+      subject.auto_acknowledge
+      expect(subject.subscription_options).to match({manual_ack: true, exclusive: false})
+
+      subject.instance_variable_set(:@auto_acknowledge, nil)
+      expect(subject.subscription_options).to match({manual_ack: false, exclusive: false})
+
+      subject.manually_acknowledge
       expect(subject.subscription_options).to match({manual_ack: true, exclusive: false})
 
       subject.exclusive
@@ -102,7 +116,7 @@ describe Philotic::Consumer do
   describe '#subscribe' do
     it 'proxies to Philotic::Subscriber#subscribe' do
       subject.subscribe_to named_queue
-      subject.ack_messages
+      subject.auto_acknowledge
       subject.exclusive
 
       expect_any_instance_of(Philotic::Subscriber).to receive(:subscribe).with(named_queue, manual_ack: true, exclusive: true)
@@ -136,7 +150,7 @@ describe Philotic::Consumer do
     end
 
     it 'acknowledges messages when @ack_messages is set' do
-      subject.class.ack_messages
+      subject.class.auto_acknowledge
 
       subject.define_singleton_method :consume do |message|
         # no op
@@ -148,7 +162,7 @@ describe Philotic::Consumer do
     end
 
     it 'requeues messages when @ack_messages is set and a requeueable error is thrown' do
-      subject.class.ack_messages
+      subject.class.auto_acknowledge
       subject.class.requeueable_errors(RuntimeError)
 
       subject.define_singleton_method :consume do |message|
@@ -161,7 +175,7 @@ describe Philotic::Consumer do
     end
 
     it 'rejects messages when @ack_messages is set and a rejectable error is thrown' do
-      subject.class.ack_messages
+      subject.class.auto_acknowledge
       subject.class.rejectable_errors(RuntimeError)
 
       subject.define_singleton_method :consume do |message|
@@ -174,7 +188,7 @@ describe Philotic::Consumer do
     end
 
     it 'raises all non-requeueable and non-rejectable errors' do
-      subject.class.ack_messages
+      subject.class.auto_acknowledge
 
       subject.define_singleton_method :consume do |message|
         raise RuntimeError.new 'oops'
