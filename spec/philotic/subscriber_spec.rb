@@ -1,4 +1,5 @@
 require 'spec_helper'
+
 require 'philotic/dummy_message'
 require 'philotic/connection'
 require 'philotic/constants'

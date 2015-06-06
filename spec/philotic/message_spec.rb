@@ -1,5 +1,7 @@
 require 'spec_helper'
+
 require 'philotic/message'
+
 # create 'deep' inheritance to test self.inherited
 class TestEventParent < Philotic::Message
 end
