@@ -1,3 +1,4 @@
+require 'philotic/singleton'
 require 'philotic/subscriber'
 
 module Philotic

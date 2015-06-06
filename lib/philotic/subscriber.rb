@@ -1,4 +1,5 @@
 require 'philotic/constants'
+require 'philotic/message'
 
 module Philotic
   class Subscriber
