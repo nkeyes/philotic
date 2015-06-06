@@ -1,4 +1,4 @@
-require 'philotic/logging/event'
+require 'philotic/logging/message'
 require 'philotic/logging/logger'
 
 module Philotic

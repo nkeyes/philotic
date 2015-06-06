@@ -4,7 +4,7 @@ module Philotic
   class Publisher
 
     attr_accessor :connection
-    attr_accessor :log_event_handler
+    attr_accessor :log_message_handler
 
     def initialize(connection)
       @connection = connection
@@ -18,16 +18,16 @@ module Philotic
       connection.config
     end
 
-    def publish(event)
-      message_metadata = {headers: event.headers}
-      message_metadata.merge!(event.message_metadata) if event.message_metadata
+    def publish(message)
+      metadata = {headers: message.headers}
+      metadata.merge!(message.metadata) if message.metadata
       begin
-        event.published = _publish(event.payload, message_metadata)
+        message.published = _publish(message.payload, metadata)
       rescue => e
-        event.publish_error = e
+        message.publish_error = e
         logger.error e.message
       end
-      event
+      message
     end
 
     def normalize_payload_times(payload)
@@ -41,45 +41,45 @@ module Philotic
     end
 
     private
-    def _publish(payload, message_metadata = {})
+    def _publish(payload, metadata = {})
       if config.disable_publish
-        log_event_published(:warn, message_metadata, payload, 'attempted to publish a message when publishing is disabled.')
+        log_message_published(:warn, metadata, payload, 'attempted to publish a message when publishing is disabled.')
         return false
       end
       connection.connect!
       unless connection.connected?
-        log_event_published(:error, message_metadata, payload, 'unable to publish event, not connected to RabbitMQ')
+        log_message_published(:error, metadata, payload, 'unable to publish message, not connected to RabbitMQ')
         return false
       end
-      message_metadata = merge_metadata(message_metadata)
+      metadata = merge_metadata(metadata)
 
       payload = normalize_payload_times(payload)
 
-      connection.exchange.publish(payload.to_json, message_metadata)
-      log_event_published(:debug, message_metadata, payload, 'published event')
+      connection.exchange.publish(payload.to_json, metadata)
+      log_message_published(:debug, metadata, payload, 'published message')
       true
     end
 
-    def merge_metadata(message_metadata)
+    def merge_metadata(metadata)
       publish_defaults = {}
       Philotic::MESSAGE_OPTIONS.each do |key|
         publish_defaults[key] = config.send(key.to_s)
       end
-      message_metadata           = publish_defaults.merge message_metadata
-      message_metadata[:headers] ||= {}
-      message_metadata[:headers] = {philotic_firehose: true}.merge(message_metadata[:headers])
-      message_metadata
+      metadata           = publish_defaults.merge metadata
+      metadata[:headers] ||= {}
+      metadata[:headers] = {philotic_firehose: true}.merge(metadata[:headers])
+      metadata
     end
 
-    def on_publish_event(&block)
-      @log_event_handler = block
+    def on_publish_message(&block)
+      @log_message_handler = block
     end
 
-    def log_event_published(severity, metadata, payload, message)
-      if @log_event_handler
-        @log_event_handler.call(severity, metadata, payload, message)
+    def log_message_published(severity, metadata, payload, message)
+      if @log_message_handler
+        @log_message_handler.call(severity, metadata, payload, message)
       else
-        logger.send(severity, "#{message}; message_metadata:#{metadata}, payload:#{payload.to_json}")
+        logger.send(severity, "#{message}; metadata:#{metadata}, payload:#{payload.to_json}")
       end
     end
   end

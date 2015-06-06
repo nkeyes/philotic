@@ -32,7 +32,7 @@ module Philotic
       :philotic_firehose,
       :philotic_product,
       :philotic_component,
-      :philotic_event_type,
+      :philotic_message_type,
   ]
 
   DEFAULT_NAMED_QUEUE_OPTIONS     = {

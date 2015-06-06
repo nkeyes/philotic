@@ -7,5 +7,8 @@ require 'rake'
 
 require 'philotic/tasks'
 # equivelant of:
-# rake philotic:init_queues[examples/creating_named_queues/philotic_queues.yml]
+# PHILOTIC_DELETE_EXISTING_QUEUES=true rake philotic:init_queues[examples/creating_named_queues/philotic_queues.yml]
+
+# Philotic.config.self.config.delete_existing_queues must be truthy to redefine existing queues
+ENV['PHILOTIC_DELETE_EXISTING_QUEUES'] = 'true'
 Rake::Task['philotic:init_queues'].invoke(File.join(File.dirname(__FILE__), 'philotic_queues.yml'))

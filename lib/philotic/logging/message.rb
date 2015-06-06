@@ -1,8 +1,8 @@
-require 'philotic/event'
+require 'philotic/message'
 
 module Philotic
   module Logging
-    class Event < Philotic::Event
+    class Message < Philotic::Message
       attr_routable :severity, :progname
       attr_payload :message
 

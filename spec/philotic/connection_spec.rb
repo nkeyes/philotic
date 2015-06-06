@@ -1,5 +1,7 @@
 require 'spec_helper'
 
+require 'philotic/connection'
+
 describe Philotic::Connection do
 
 
