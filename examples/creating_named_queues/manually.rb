@@ -8,7 +8,7 @@ require 'philotic'
 # Philotic.config.initialize_named_queues must be truthy to run Philotic.initialize_named_queue!
 Philotic.config.initialize_named_queues = true
 
-Philotic.initialize_named_queue!('male_queue', bindings: [{:'x-match' => 'all', gender: :M, available: true}])
-Philotic.initialize_named_queue!('female_queue', bindings: [{:'x-match' => 'all', gender: :F, available: true}])
-Philotic.initialize_named_queue!('test_queue', bindings: [{ :'x-match' => 'any', gender: :M, available: true }])
-Philotic.initialize_named_queue!('flaky_queue', bindings: [{ :'x-match' => 'any', gender: :M, available: true }])
+Philotic.initialize_named_queue!('mauve_queue', bindings: [{:'x-match' => 'all', hue: :M, available: true}])
+Philotic.initialize_named_queue!('fuchsia_queue', bindings: [{:'x-match' => 'all', hue: :F, available: true}])
+Philotic.initialize_named_queue!('test_queue', bindings: [{ :'x-match' => 'any', hue: :M, available: true }])
+Philotic.initialize_named_queue!('flaky_queue', bindings: [{ :'x-match' => 'any', hue: :M, available: true }])

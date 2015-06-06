@@ -12,8 +12,8 @@ philotic.config.message_return_handler = lambda do |basic_return, metadata, mess
   philotic.logger.warn { "Message returned. reply_text: #{basic_return.reply_text}" }
 end
 
-philotic.subscribe(header_key: 'header_1') do |message, metadata, queue|
-  ap message[:attributes]
+philotic.subscribe(header_key: 'header_1') do |message|
+  ap message.attributes
 end
 
 # normally we'd do:
@@ -23,8 +23,8 @@ end
 # to keep the parent thread alive while the subscribers do their thing
 # but this infinite publish loop takes care of that
 loop do
-  event = Philotic::Event.new({header_key: "header_#{[1, 2].sample}"}, {payload_key: 'payload_value'})
-  philotic.publish event
+  message = Philotic::Message.new({header_key: "header_#{[1, 2].sample}"}, {payload_key: 'payload_value'})
+  philotic.publish message
   # only send a message every two seconds so we can see whats going on
   sleep 2
 end

@@ -1,15 +1,15 @@
 require 'logger'
-require 'philotic/logging/event'
+require 'philotic/logging/message'
 
 module Philotic
   module Logging
     class Logger < ::Logger
 
-      attr_writer :event_class
+      attr_writer :message_class
       attr_accessor :connection
 
-      def event_class
-        @event_class ||= Philotic::Logging::Event
+      def message_class
+        @message_class ||= Philotic::Logging::Message
       end
 
       def add(severity, message = nil, progname = nil)
@@ -28,8 +28,8 @@ module Philotic
         end
         @logdev.write(format_message(format_severity(severity), Time.now, progname, message))
         begin
-          event = event_class.new(severity, message, progname)
-          connection.publish event if connection
+          message = message_class.new(severity, message, progname)
+          connection.publish message if connection
         rescue => e
           @logdev.write(format_message(format_severity(Logger::ERROR), Time.now, progname, e.message))
         end

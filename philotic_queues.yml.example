@@ -1,19 +1,19 @@
-available_or_male:
-  gender: Male
+available_or_mauve:
+  hue: Mauve
   available: true
   x-match: any
   
-available_male:
-  gender: Male
+available_mauve:
+  hue: Mauve
   available: true
   x-match: all
   
-available_or_female:
-  gender: Female
+available_or_fuchsia:
+  hue: Fuchsia
   available: true
   x-match: any
   
-available_female:
-  gender: Female
+available_fuchsia:
+  hue: Fuchsia
   available: true
   x-match: all
