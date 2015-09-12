@@ -3,7 +3,7 @@ require 'philotic/singleton'
 
 module Philotic
   class Message
-     NotInstantiableError = Class.new(RuntimeError)
+    NotInstantiableError = Class.new(RuntimeError)
 
     attr_accessor :connection, :publish_error, :delivery_info
     attr_writer :published
@@ -104,9 +104,9 @@ module Philotic
 
     private
 
-     def _is_anonymous_message?
-       self.is_a?(Philotic::Message) && self.class.name.nil?
-     end
+    def _is_anonymous_message?
+      self.is_a?(Philotic::Message) && self.class.name.nil?
+    end
 
     def _payload_or_headers(payload_or_headers)
       attribute_hash = {}
