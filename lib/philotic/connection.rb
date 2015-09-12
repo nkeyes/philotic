@@ -114,7 +114,7 @@ module Philotic
     end
 
     def initialize_named_queue!(queue_name, config)
-      raise 'Philotic.config.initialize_named_queues must be true to run Philotic.initialize_named_queue!' unless self.config.initialize_named_queues
+      raise RuntimeError.new 'Philotic.config.initialize_named_queues must be true to run Philotic.initialize_named_queue!' unless self.config.initialize_named_queues
 
       connect!
       queue_exists = connection.queue_exists? queue_name

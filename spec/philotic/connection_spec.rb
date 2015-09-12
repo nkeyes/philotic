@@ -105,7 +105,7 @@ describe Philotic::Connection do
       queue_name = test_queues.keys.first
       config     = test_queues[queue_name]
       expect(subject).not_to receive(:connect!)
-      expect { subject.initialize_named_queue! queue_name, config }.to raise_error
+      expect { subject.initialize_named_queue! queue_name, config }.to raise_error(RuntimeError)
 
     end
 
