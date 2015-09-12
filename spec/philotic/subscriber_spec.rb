@@ -8,15 +8,34 @@ require 'philotic/subscriber'
 describe Philotic::Subscriber do
 
 
+  describe '#subscription_callback' do
+
+    subject { Philotic::Connection.new.subscriber }
+    let(:subscribe_callback) do
+      Proc.new do |message|
+        message
+      end
+    end
+
+    let(:delivery_info) { double }
+    let(:metadata) { {headers: {header_1: 'foo'}} }
+    let(:payload) { {message: 'body'} }
+
+    it 'hydrates received messages' do
+      message = subject.subscription_callback(&subscribe_callback).call(delivery_info, metadata, payload.to_json)
+      expect(message).to be_a Philotic::Message
+      expect(message.headers).to include(metadata[:headers])
+      expect(message.payload).to eq payload
+    end
+  end
+
   describe '#subscribe' do
     let(:subscription) { 'some_queue' }
     subject { Philotic::Connection.new.subscriber }
     context 'when options is a string' do
       it 'binds to a queue defined by the options' do
-
-        exchange = double
-        channel  = double
-        queue    = double
+        channel = double
+        queue   = double
 
         metadata = double
         message  = double
@@ -41,7 +60,7 @@ describe Philotic::Subscriber do
     context 'when options is not a string' do
       let(:subscription) do
         {
-            firehose: true
+          firehose: true
         }
       end
       it 'binds to a queue defined by the options' do
@@ -75,9 +94,9 @@ describe Philotic::Subscriber do
   describe '#subscribe_to_any' do
     let(:headers) do
       {
-          header1: 'h1',
-          header2: 'h2',
-          header3: 'h3',
+        header1: 'h1',
+        header2: 'h2',
+        header3: 'h3',
       }
     end
     subject { Philotic::Connection.new.subscriber }

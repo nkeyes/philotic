@@ -22,7 +22,7 @@ module Philotic
       lambda do |delivery_info, metadata, payload|
         hash_payload = JSON.parse payload
 
-        message = Philotic::Message.new(metadata[:headers], hash_payload)
+        message = Class.new(Philotic::Message).new(metadata[:headers], hash_payload)
         message.delivery_info = delivery_info
 
         instance_exec(message, &block)
