@@ -3,6 +3,7 @@ require 'philotic/singleton'
 
 module Philotic
   class Message
+    NotInstantiableError = Class.new(RuntimeError)
 
     attr_accessor :connection, :publish_error, :delivery_info
     attr_writer :published
@@ -28,6 +29,7 @@ module Philotic
     end
 
     def initialize(routables={}, payloads={}, connection=nil)
+      raise NotInstantiableError if self.class == Philotic::Message
       self.timestamp         = Time.now.to_i
       self.philotic_firehose = true
       self.connection        = connection
@@ -71,7 +73,8 @@ module Philotic
     end
 
     def self.publish(*args)
-      self.new(*args).publish
+      message_class = self == Philotic::Message ? Class.new(self) : self
+      message_class.new(*args).publish
     end
 
     def delivery_tag
@@ -101,6 +104,10 @@ module Philotic
 
     private
 
+    def _is_anonymous_message?
+      self.is_a?(Philotic::Message) && self.class.name.nil?
+    end
+
     def _payload_or_headers(payload_or_headers)
       attribute_hash = {}
       self.class.send("attr_#{payload_or_headers}_accessors").each do |attr|
@@ -114,7 +121,7 @@ module Philotic
       attrs.each do |key, value|
         if self.respond_to?(:"#{key}=")
           send(:"#{key}=", value)
-        elsif self.class == Philotic::Message
+        elsif _is_anonymous_message?
           _set_message_attribute(type, key, value)
         end
       end
