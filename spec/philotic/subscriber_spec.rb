@@ -92,7 +92,7 @@ describe Philotic::Subscriber do
     let(:channel) { double }
     let(:delivery_tag) { double }
     let(:delivery_info) { double }
-    let(:message) { Philotic::Message.new }
+    let(:message) { Class.new(Philotic::Message).new }
     subject { Philotic::Connection.new.subscriber }
 
     specify do
@@ -108,7 +108,7 @@ describe Philotic::Subscriber do
     let(:channel) { double }
     let(:delivery_tag) { double }
     let(:delivery_info) { double }
-    let(:message) { Philotic::Message.new }
+    let(:message) { Class.new(Philotic::Message).new }
     subject { Philotic::Connection.new.subscriber }
 
     specify do

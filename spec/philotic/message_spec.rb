@@ -11,6 +11,11 @@ class TestEvent < TestEventParent
 end
 
 describe Philotic::Message do
+
+  it 'is not instantiable' do
+    expect { Philotic::Message.new }.to raise_error(Philotic::Message::NotInstantiableError)
+  end
+
   let(:message) { TestEvent.new }
   subject { message }
 
@@ -39,15 +44,6 @@ describe Philotic::Message do
     expect(subject.metadata.keys).to eq([:timestamp])
   end
 
-  context 'overriding a value with metadata=' do
-    before do
-      subject.metadata = {mandatory: false}
-    end
-    it 'should work' do
-      expect(subject.metadata).to include({mandatory: false})
-    end
-  end
-
   Philotic::Message.methods.sort.each do |method_name|
     specify { expect(subject.class.methods).to include method_name.to_sym }
   end
@@ -63,6 +59,16 @@ describe Philotic::Message do
   end
 
   describe 'metadata' do
+
+    context 'overriding a value with metadata=' do
+      before do
+        subject.metadata = {mandatory: false}
+      end
+      it 'should work' do
+        expect(subject.metadata).to include({mandatory: false})
+      end
+    end
+
     it 'should have a timestamp' do
       Timecop.freeze
       expect(subject.metadata).to eq(timestamp: Time.now.to_i)
@@ -80,7 +86,7 @@ describe Philotic::Message do
     end
   end
 
-  context 'generic message' do
+  describe 'generic messages' do
     let(:headers) do
       {
         header1: 'h1',
@@ -96,23 +102,105 @@ describe Philotic::Message do
         payload3: 'h3',
       }
     end
-    it 'builds an message with dynamic headers and payloads' do
-      message = Philotic::Message.new(headers, payloads)
 
-      expect(message.headers).to include(headers)
-      expect(message.payload).to eq payloads
+    describe 'publishing messages' do
+      let(:message_1_headers) { {message_1_header_1: 1, message_1_header_2: 2} }
+      let(:message_1_payload) { {message_1_payload_1: 1, message_1_payload_2: 2} }
 
+      let(:message_2_headers) { {message_2_header_1: 1, message_2_header_2: 2} }
+      let(:message_2_payload) { {message_2_payload_1: 1, message_2_payload_2: 2} }
+
+      it 'builds the proper routable accessors' do
+        expect(Philotic.connection).to receive(:publish) do |message|
+          expect(message.class.attr_routable_accessors).to include(*message_1_headers.keys)
+        end
+        Philotic::Message.publish message_1_headers, message_1_payload
+      end
+
+      it 'builds the proper payload accessors' do
+        expect(Philotic.connection).to receive(:publish) do |message|
+          expect(message.class.attr_payload_accessors).to include(*message_1_payload.keys)
+        end
+        Philotic::Message.publish message_1_headers, message_1_payload
+      end
+
+      it 'builds the proper headers' do
+        expect(Philotic.connection).to receive(:publish) do |message|
+          expect(message.headers).to include(message_1_headers)
+        end
+        Philotic::Message.publish message_1_headers, message_1_payload
+      end
+
+      it 'builds the proper payload' do
+        expect(Philotic.connection).to receive(:publish) do |message|
+          expect(message.payload).to include(message_1_payload)
+        end
+        Philotic::Message.publish message_1_headers, message_1_payload
+      end
+
+      describe 'in succession' do
+        it 'builds the proper routable accessors on succesive calls' do
+          allow(Philotic.connection).to receive(:publish)
+          Philotic::Message.publish message_1_headers, message_1_payload
+
+          expect(Philotic.connection).to receive(:publish) do |message|
+            expect(message.class.attr_routable_accessors).not_to include(*message_1_headers.keys)
+            expect(message.class.attr_routable_accessors).to include(*message_2_headers.keys)
+          end
+
+          Philotic::Message.publish message_2_headers, message_2_payload
+
+        end
+
+        it 'builds the proper payload accessors on succesive calls' do
+          allow(Philotic.connection).to receive(:publish)
+          Philotic::Message.publish message_1_headers, message_1_payload
+
+          expect(Philotic.connection).to receive(:publish) do |message|
+            expect(message.class.attr_payload_accessors).not_to include(*message_1_payload.keys)
+            expect(message.class.attr_payload_accessors).to include(*message_2_payload.keys)
+          end
+
+          Philotic::Message.publish message_2_headers, message_2_payload
+
+        end
+
+        it 'builds the proper headers on succesive calls' do
+          allow(Philotic.connection).to receive(:publish)
+          Philotic::Message.publish message_1_headers, message_1_payload
+
+          expect(Philotic.connection).to receive(:publish) do |message|
+            expect(message.headers).not_to include(message_1_headers)
+            expect(message.headers).to include(message_2_headers)
+          end
+
+          Philotic::Message.publish message_2_headers, message_2_payload
+
+        end
+
+        it 'builds the proper payload on succesive calls' do
+          allow(Philotic.connection).to receive(:publish)
+          Philotic::Message.publish message_1_headers, message_1_payload
+
+          expect(Philotic.connection).to receive(:publish) do |message|
+            expect(message.payload).not_to include(message_1_payload)
+            expect(message.payload).to include(message_2_payload)
+          end
+
+          Philotic::Message.publish message_2_headers, message_2_payload
+
+        end
+      end
     end
   end
 
   describe '#publish' do
-    subject { Philotic::Message.new }
+    subject { Class.new(Philotic::Message).new }
     specify do
       expect(subject.connection).to receive(:publish).with(subject)
 
       subject.publish
     end
-
   end
 
   describe '.publish' do
