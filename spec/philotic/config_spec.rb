@@ -40,4 +40,10 @@ describe Philotic::Config do
                      ]
     end
   end
+
+  describe '#serializer' do
+    it 'returns the class mapped from an underscore formatted string' do
+      expect(Philotic.config.serializer).to eq Philotic::Serializer::Json
+    end
+  end
 end

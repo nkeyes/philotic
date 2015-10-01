@@ -33,6 +33,7 @@ module Philotic
       :philotic_product,
       :philotic_component,
       :philotic_message_type,
+      :philotic_serializer,
   ]
 
   DEFAULT_NAMED_QUEUE_OPTIONS     = {

@@ -1,5 +1,6 @@
 require 'philotic/constants'
 require 'philotic/message'
+require 'philotic/serializer'
 
 module Philotic
   class Subscriber
@@ -20,7 +21,8 @@ module Philotic
 
     def subscription_callback(&block)
       lambda do |delivery_info, metadata, payload|
-        hash_payload = JSON.parse payload
+        serializer = Philotic::Serializer.factory(metadata[:headers][:philotic_serializer])
+        hash_payload = serializer.load payload
 
         message = Philotic::Message.new(metadata[:headers], hash_payload)
         message.delivery_info = delivery_info

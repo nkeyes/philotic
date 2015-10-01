@@ -55,7 +55,7 @@ module Philotic
 
       payload = normalize_payload_times(payload)
 
-      connection.exchange.publish(payload.to_json, metadata)
+      connection.exchange.publish(config.serializer.dump(payload), metadata)
       log_message_published(:debug, metadata, payload, 'published message')
       true
     end

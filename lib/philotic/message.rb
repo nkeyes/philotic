@@ -1,5 +1,6 @@
 require 'philotic/constants'
 require 'philotic/singleton'
+require 'active_support/inflections'
 
 module Philotic
   class Message
@@ -33,6 +34,7 @@ module Philotic
       self.timestamp         = Time.now.to_i
       self.philotic_firehose = true
       self.connection        = connection
+      self.philotic_serializer = self.connection.config.serializer.name.underscore
 
       # dynamically insert any passed in routables into both attr_routable
       # and attr_payload

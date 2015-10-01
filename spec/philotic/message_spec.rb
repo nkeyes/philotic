@@ -204,7 +204,9 @@ describe Philotic::Message do
   end
 
   describe '.publish' do
-    let (:connection) { double }
+    let (:connection) { instance_double Philotic::Connection }
+    let (:config) { instance_double Philotic::Config }
+    let (:serializer) { Philotic::Serializer::Json }
     let(:headers) do
       {
         header1: 'h1',
@@ -222,7 +224,10 @@ describe Philotic::Message do
     end
     subject { Philotic::Message }
     specify do
-      expect_any_instance_of(Philotic::Message).to receive(:connection).and_return(connection)
+      expect_any_instance_of(Philotic::Message).to receive(:connection).twice.and_return(connection)
+      expect(connection).to receive(:config).and_return(config)
+      expect(config).to receive(:serializer).and_return(serializer)
+
       expect(connection).to receive(:publish) do |message|
         expect(message.headers).to include(headers)
         expect(message.payload).to eq payloads
