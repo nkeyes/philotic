@@ -24,7 +24,7 @@ module Philotic
         serializer = Philotic::Serializer.factory(metadata[:headers][:philotic_serializer])
         hash_payload = serializer.load payload
 
-        message = Philotic::Message.new(metadata[:headers], hash_payload)
+        message = Class.new(Philotic::Message).new(metadata[:headers], hash_payload)
         message.delivery_info = delivery_info
 
         instance_exec(message, &block)
