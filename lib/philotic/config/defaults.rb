@@ -21,7 +21,7 @@ module Philotic
       PERSISTENT              = false
       IMMEDIATE               = false
       MANDATORY               = false
-      SERIALIZATIONS          = '["json", "encrypted"]' # serializations is expected to be a JSON ray of strings
+      SERIALIZATIONS          = '["json"]' # serializations is expected to be a JSON ray of strings
       CONTENT_ENCODING        = nil
       PRIORITY                = nil
       MESSAGE_ID              = nil

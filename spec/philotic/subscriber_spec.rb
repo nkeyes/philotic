@@ -18,7 +18,7 @@ describe Philotic::Subscriber do
     end
 
     let(:delivery_info) { double }
-    let(:metadata) { {headers: {header_1: 'foo'}} }
+    let(:metadata) { {headers: {header_1: 'foo', philotic_serializations: Philotic.config.serializations}} }
     let(:payload) { {message: 'body'} }
 
     it 'hydrates received messages' do

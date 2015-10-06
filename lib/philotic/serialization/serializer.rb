@@ -31,7 +31,7 @@ module Philotic
 
         serializations = headers[:philotic_serializations]
 
-        serializations.reverse! if dump_or_load == :load
+        serializations.reverse! if(dump_or_load == :load)
 
         serializations.reduce(payload.dup) do |transformed, serialization|
           serializer = factory serialization
