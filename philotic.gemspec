@@ -27,6 +27,7 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'timecop', '~> 0.8'
 
   gem.add_dependency 'activesupport', '>= 3.2'
+  gem.add_dependency 'encryptor', '~> 1.3'
   gem.add_dependency 'bunny', '~> 2.2'
   gem.add_dependency 'multi_json', '~> 1.11'
   gem.add_dependency 'oj', '~> 2.12'

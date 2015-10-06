@@ -1,5 +1,6 @@
 require 'yaml'
-require 'json'
+require 'multi_json'
+require 'oj'
 require 'singleton'
 require 'forwardable'
 require 'cgi'
@@ -97,19 +98,13 @@ module Philotic
       load_config(config[env])
     end
 
-    def serializer
-      self.serializer = defaults[:serializer] unless @serializer
-      @serializer
-    end
-
-    def serializer=(val)
-      val = val.to_s
-      require val
-      @serializer = val.to_s.classify.constantize
+    def serializations
+      self.serializations = MultiJson.load(defaults[:serializations]) unless @serializations
+      @serializations
     end
 
     def content_type
-      serializer.content_type
+      Philotic::Serialization::Serializer.factory(serializations.last).content_type
     end
   end
 end

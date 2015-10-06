@@ -28,13 +28,13 @@ describe Philotic::Publisher do
                            },
                            {
                              headers:   {
-                               philotic_firehose:     true,
-                               philotic_product:      nil,
-                               philotic_component:    nil,
-                               philotic_message_type: nil,
-                               philotic_serializer:   'philotic/serializer/json',
-                               hue:                   :M,
-                               available:             true,
+                               philotic_firehose:       true,
+                               philotic_product:        nil,
+                               philotic_component:      nil,
+                               philotic_message_type:   nil,
+                               philotic_serializations: %w[json encrypted],
+                               hue:                     :M,
+                               available:               true,
                              },
                              timestamp: Time.now.to_i
                            }
@@ -96,13 +96,13 @@ describe Philotic::Publisher do
         app_id:           nil,
         expiration:       nil,
         headers:          {
-          philotic_firehose:     true,
-          philotic_product:      nil,
-          philotic_component:    nil,
-          philotic_message_type: nil,
-          philotic_serializer:   'philotic/serializer/json',
-          hue:                   :M,
-          available:             true,
+          philotic_firehose:       true,
+          philotic_product:        nil,
+          philotic_component:      nil,
+          philotic_message_type:   nil,
+          philotic_serializations: %w[json encrypted],
+          hue:                     :M,
+          available:               true,
         },
         timestamp:        Time.now.to_i
       }

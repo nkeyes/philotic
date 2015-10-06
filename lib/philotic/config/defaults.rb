@@ -21,7 +21,7 @@ module Philotic
       PERSISTENT              = false
       IMMEDIATE               = false
       MANDATORY               = false
-      SERIALIZER              = 'philotic/serializer/json'
+      SERIALIZATIONS          = '["json", "encrypted"]' # serializations is expected to be a JSON ray of strings
       CONTENT_ENCODING        = nil
       PRIORITY                = nil
       MESSAGE_ID              = nil
@@ -34,6 +34,7 @@ module Philotic
       EXPIRATION              = nil
       CONNECTION_ATTEMPTS     = 3
       PREFETCH_COUNT          = 0
+      RAISE_ERROR_ON_PUBLISH  = false
 
       def defaults
         @defaults ||= Hash[Philotic::Config::Defaults.constants.map do |c|
