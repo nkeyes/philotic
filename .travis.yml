@@ -2,12 +2,15 @@ language: ruby
 before_install: gem install bundler -v 1.10.6
 rvm:
 - 2.0.0
-- 2.1
-- 2.2
+- 2.1.5
+- 2.2.0
+- 2.2.1
+- 2.2.2
+- 2.2.3
 - rbx-2
-# - jruby-19mode
+- jruby-19mode
 - ruby-head
-# - jruby-head
+- jruby-head
 script:
 - bundle exec rspec
 addons:
@@ -20,3 +23,9 @@ notifications:
       secure: akLY832/pt0+9Y2TFKpzW08bagPMY//AcQJ5JGzc0yd3hZbXTlkW4S8bMEclBeHBqLGCV6vaWeN90PiYwIBs4IWlxopPAop4BEWeqRvD8+B4fxarXYwejt54vH3v4iCnHhSNBpFJDbykyfL0f0g9fhvM48eHzhBXTxPZfpQ9nXs=
     template:
       - '%{repository}#%{build_number} (%{branch} - %{commit} : %{author}): %{message}'
+
+matrix:
+  allow_failures:
+    - rvm: jruby-19mode
+    - rvm: jruby-head
+    - rvm: ruby-head

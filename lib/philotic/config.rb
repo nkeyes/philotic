@@ -39,20 +39,7 @@ module Philotic
       @prefetch_count ||= defaults[:prefetch_count].to_i
     end
 
-    attr_writer :connection_failed_handler, :connection_loss_handler, :message_return_handler
-
-    def connection_failed_handler
-      @connection_failed_handler ||= lambda do |settings|
-        logger.error { "RabbitMQ connection failure: #{sanitized_rabbit_url}" }
-      end
-    end
-
-    def connection_loss_handler
-      @connection_loss_handler ||= lambda do |conn, settings|
-        logger.warn { "RabbitMQ connection loss: #{sanitized_rabbit_url}" }
-        conn.reconnect(false, 2)
-      end
-    end
+    attr_writer :message_return_handler
 
     def message_return_handler
       @message_return_handler ||= lambda do |basic_return, metadata, payload|

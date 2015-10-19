@@ -82,9 +82,9 @@ module Philotic
 
     def connection_settings
       {
-          timeout:                   config.timeout.to_i,
-          automatic_recovery:        true,
-          on_tcp_connection_failure: config.connection_failed_handler,
+        automatically_recover: config.automatically_recover,
+        network_recovery_interval: config.network_recovery_interval,
+        continuation_timeout: config.continuation_timeout,
       }
     end
 
