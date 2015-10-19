@@ -69,7 +69,12 @@ end
 
 ### Tested with the following Rubies
 * 2.0.0
-* 2.1.x
-* 2.2.x
-* rbx-2
-* ruby-head
+* 2.1.5
+* 2.2.0
+* 2.2.1
+* 2.2.2
+* 2.2.3
+* rbx*2
+* jruby*19mode
+* ruby*head
+* jruby*head
