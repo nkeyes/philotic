@@ -7,6 +7,23 @@ require 'philotic/subscriber'
 
 describe Philotic::Subscriber do
 
+  describe '#logger' do
+    let(:logger) { instance_double(Logger) }
+    let(:connection) { instance_double(Philotic::Connection, logger: logger) }
+    subject { described_class.new connection }
+    it 'is the connection logger' do
+      expect(subject.logger).to be subject.connection.logger
+    end
+  end
+
+  describe '#config' do
+    let(:config) { instance_double(Philotic::Config) }
+    let(:connection) { instance_double(Philotic::Connection, config: config) }
+    subject { described_class.new connection }
+    it 'is the connection logger' do
+      expect(subject.config).to be subject.connection.config
+    end
+  end
 
   describe '#subscription_callback' do
 
@@ -18,7 +35,7 @@ describe Philotic::Subscriber do
     end
 
     let(:delivery_info) { double }
-    let(:metadata) { {headers: {header_1: 'foo'}} }
+    let(:metadata) { {headers: {header_1: 'foo', philotic_serializations: Philotic.config.serializations}} }
     let(:payload) { {message: 'body'} }
 
     it 'hydrates received messages' do

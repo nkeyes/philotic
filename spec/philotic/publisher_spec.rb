@@ -22,21 +22,22 @@ describe Philotic::Publisher do
     it 'should call _publish with the right values' do
       Timecop.freeze
       expect(subject).to receive(:_publish).with(
-                             {
-                                 subject: 'Hello',
-                                 message: 'How are you?'
+                           {
+                             subject: 'Hello',
+                             message: 'How are you?'
+                           },
+                           {
+                             headers:   {
+                               philotic_firehose:       true,
+                               philotic_product:        nil,
+                               philotic_component:      nil,
+                               philotic_message_type:   nil,
+                               philotic_serializations: Philotic.config.serializations,
+                               hue:                     :M,
+                               available:               true,
                              },
-                             {
-                                 headers:   {
-                                     philotic_firehose:     true,
-                                     philotic_product:      nil,
-                                     philotic_component:    nil,
-                                     philotic_message_type: nil,
-                                     hue:                   :M,
-                                     available:             true,
-                                 },
-                                 timestamp: Time.now.to_i
-                             }
+                             timestamp: Time.now.to_i
+                           }
                          )
       expect(message).to_not be_published
       subject.publish(message)
@@ -80,38 +81,39 @@ describe Philotic::Publisher do
       expect(subject.connection).to receive(:connect!)
       expect(subject.connection).to receive(:connected?).and_return(true)
       metadata = {
-          routing_key:      nil,
-          persistent:       false,
-          immediate:        false,
-          mandatory:        false,
-          content_type:     'application/json',
-          content_encoding: nil,
-          priority:         nil,
-          message_id:       nil,
-          correlation_id:   nil,
-          reply_to:         nil,
-          type:             nil,
-          user_id:          nil,
-          app_id:           nil,
-          expiration:       nil,
-          headers:          {
-              philotic_firehose:     true,
-              philotic_product:      nil,
-              philotic_component:    nil,
-              philotic_message_type: nil,
-              hue:                   :M,
-              available:             true,
-          },
-          timestamp:        Time.now.to_i
+        routing_key:      nil,
+        persistent:       false,
+        immediate:        false,
+        mandatory:        false,
+        content_type:     'application/json',
+        content_encoding: nil,
+        priority:         nil,
+        message_id:       nil,
+        correlation_id:   nil,
+        reply_to:         nil,
+        type:             nil,
+        user_id:          nil,
+        app_id:           nil,
+        expiration:       nil,
+        headers:          {
+          philotic_firehose:       true,
+          philotic_product:        nil,
+          philotic_component:      nil,
+          philotic_message_type:   nil,
+          philotic_serializations: Philotic.config.serializations,
+          hue:                     :M,
+          available:               true,
+        },
+        timestamp:        Time.now.to_i
       }
 
 
       expect(exchange).to receive(:publish).with(
-                              {
-                                  subject: 'Hello',
-                                  message: 'How are you?'
-                              }.to_json,
-                              metadata
+                            {
+                              subject: 'Hello',
+                              message: 'How are you?'
+                            }.to_json,
+                            metadata
                           )
       expect(message).to_not be_published
       subject.publish(message)

@@ -1,13 +1,17 @@
+sudo: false
 language: ruby
 before_install: gem install bundler -v 1.10.6
 rvm:
 - 2.0.0
-- 2.1
-- 2.2
+- 2.1.5
+- 2.2.0
+- 2.2.1
+- 2.2.2
+- 2.2.3
 - rbx-2
-# - jruby-19mode
+- jruby-19mode
 - ruby-head
-# - jruby-head
+- jruby-head
 script:
 - bundle exec rspec
 addons:
@@ -17,6 +21,11 @@ addons:
 notifications:
   hipchat:
     rooms:
-      secure: akLY832/pt0+9Y2TFKpzW08bagPMY//AcQJ5JGzc0yd3hZbXTlkW4S8bMEclBeHBqLGCV6vaWeN90PiYwIBs4IWlxopPAop4BEWeqRvD8+B4fxarXYwejt54vH3v4iCnHhSNBpFJDbykyfL0f0g9fhvM48eHzhBXTxPZfpQ9nXs=
+      secure: HXE1RU8b95gp0/4QoQXws1dVSw+uHGg0wqb/q5EKBjvKXxaqfIrBWeZlTAn3ykz8HQja8YoUOlwFL7lpmwdbXlbmuSb0RPyqWURNvooDw3twn675E0dtf5vlKWbADsIK73Gs1LfR3Gpb0l/85T5P+/knNRkh9p43hqiRaW/LJ/M=
     template:
-      - '%{repository}#%{build_number} (%{branch} - %{commit} : %{author}): %{message}'
+    - "%{repository}#%{build_number} (%{branch} - %{commit} : %{author}): %{message}"
+matrix:
+  allow_failures:
+  - rvm: jruby-19mode
+  - rvm: jruby-head
+  - rvm: ruby-head

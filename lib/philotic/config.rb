@@ -1,46 +1,20 @@
 require 'yaml'
-require 'json'
+require 'multi_json'
+require 'oj'
 require 'singleton'
 require 'forwardable'
 require 'cgi'
 require 'bunny/session'
 require 'logger'
+require 'philotic/config/defaults'
+require 'active_support/inflections'
 
 module Philotic
   class Config
 
-    ENV_PREFIX = 'PHILOTIC'
+    include Defaults
 
-    DEFAULT_DISABLE_PUBLISH         = false
-    DEFAULT_INITIALIZE_NAMED_QUEUES = false
-    DEFAULT_DELETE_EXISTING_QUEUES  = false
-    DEFAULT_LOG_LEVEL               = Logger::DEBUG
-    DEFAULT_RABBIT_SCHEME           = 'amqp'
-    DEFAULT_RABBIT_HOST             = 'localhost'
-    DEFAULT_RABBIT_PORT             = 5672
-    DEFAULT_RABBIT_USER             = 'guest'
-    DEFAULT_RABBIT_PASSWORD         = 'guest'
-    DEFAULT_RABBIT_VHOST            = '%2f' # '/'
-    DEFAULT_RABBIT_URL              = "#{DEFAULT_RABBIT_SCHEME}://#{DEFAULT_RABBIT_USER}:#{DEFAULT_RABBIT_PASSWORD}@#{DEFAULT_RABBIT_HOST}:#{DEFAULT_RABBIT_PORT}/#{DEFAULT_RABBIT_VHOST}"
-    DEFAULT_EXCHANGE_NAME           = 'philotic.headers'
-    DEFAULT_TIMEOUT                 = 2
-    DEFAULT_ROUTING_KEY             = nil
-    DEFAULT_PERSISTENT              = false
-    DEFAULT_IMMEDIATE               = false
-    DEFAULT_MANDATORY               = false
-    DEFAULT_CONTENT_TYPE            = 'application/json'
-    DEFAULT_CONTENT_ENCODING        = nil
-    DEFAULT_PRIORITY                = nil
-    DEFAULT_MESSAGE_ID              = nil
-    DEFAULT_CORRELATION_ID          = nil
-    DEFAULT_REPLY_TO                = nil
-    DEFAULT_TYPE                    = nil
-    DEFAULT_USER_ID                 = nil
-    DEFAULT_APP_ID                  = nil
-    DEFAULT_TIMESTAMP               = nil
-    DEFAULT_EXPIRATION              = nil
-    DEFAULT_CONNECTION_ATTEMPTS     = 3
-    DEFAULT_PREFETCH_COUNT          = 0
+    ENV_PREFIX = 'PHILOTIC'
 
     attr_accessor :connection
 
@@ -51,29 +25,6 @@ module Philotic
 
     def logger
       connection.logger
-    end
-
-    def defaults
-      @defaults ||= Hash[Config.constants.select { |c| c.to_s.start_with? 'DEFAULT_' }.collect do |c|
-                           key = c.slice(8..-1).downcase.to_sym
-
-                           env_key = "#{ENV_PREFIX}_#{key}".upcase
-
-                           [key, ENV[env_key] || Config.const_get(c)]
-                         end
-      ]
-    end
-
-    Config.constants.each do |c|
-      if c.to_s.start_with? 'DEFAULT_'
-        attr_symbol = c.slice(8..-1).downcase.to_sym
-        attr_writer attr_symbol
-        class_eval %Q{
-          def #{attr_symbol}
-            @#{attr_symbol} ||= defaults[:#{attr_symbol}]
-          end
-        }
-      end
     end
 
     def log_level
@@ -88,20 +39,7 @@ module Philotic
       @prefetch_count ||= defaults[:prefetch_count].to_i
     end
 
-    attr_writer :connection_failed_handler, :connection_loss_handler, :message_return_handler
-
-    def connection_failed_handler
-      @connection_failed_handler ||= lambda do |settings|
-        logger.error { "RabbitMQ connection failure: #{sanitized_rabbit_url}" }
-      end
-    end
-
-    def connection_loss_handler
-      @connection_loss_handler ||= lambda do |conn, settings|
-        logger.warn { "RabbitMQ connection loss: #{sanitized_rabbit_url}" }
-        conn.reconnect(false, 2)
-      end
-    end
+    attr_writer :message_return_handler
 
     def message_return_handler
       @message_return_handler ||= lambda do |basic_return, metadata, payload|
@@ -118,7 +56,7 @@ module Philotic
         current_value = send("rabbit_#{setting}")
 
         # only use the value from the URI if the existing value is nil or the default
-        if settings[setting] && [self.class.const_get("default_rabbit_#{setting}".upcase), nil].include?(current_value)
+        if settings[setting] && [Defaults.const_get("rabbit_#{setting}".upcase), nil].include?(current_value)
           send("rabbit_#{setting}=", settings[setting])
         end
       end
@@ -145,6 +83,15 @@ module Philotic
     def load_file(filename, env = 'development')
       config = YAML.load_file(filename)
       load_config(config[env])
+    end
+
+    def serializations
+      self.serializations = MultiJson.load(defaults[:serializations]) unless @serializations
+      @serializations
+    end
+
+    def content_type
+      Philotic::Serialization::Serializer.factory(serializations.last).content_type
     end
   end
 end

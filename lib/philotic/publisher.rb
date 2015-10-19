@@ -1,4 +1,5 @@
 require 'philotic/constants'
+require 'philotic/serialization/serializer'
 
 module Philotic
   class Publisher
@@ -26,6 +27,7 @@ module Philotic
       rescue => e
         message.publish_error = e
         logger.error e.message
+        raise e if config.raise_error_on_publish
       end
       message
     end
@@ -55,7 +57,7 @@ module Philotic
 
       payload = normalize_payload_times(payload)
 
-      connection.exchange.publish(payload.to_json, metadata)
+      connection.exchange.publish(Philotic::Serialization::Serializer.dump(payload, metadata), metadata)
       log_message_published(:debug, metadata, payload, 'published message')
       true
     end
