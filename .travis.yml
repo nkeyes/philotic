@@ -26,4 +26,5 @@ notifications:
 
 matrix:
   allow_failures:
-    - rvm: 1.8.7
+    - rvm:
+      - ruby-head
