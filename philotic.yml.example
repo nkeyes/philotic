@@ -1,9 +1,6 @@
 defaults: &defaults
   #connection settings
   rabbit_host: localhost
-  # connection_failed_handler: method/proc
-  # connection_loss_handler: method/proc
-  timeout: 2
   
   #exchange settings
   exchange_name: philotic.headers

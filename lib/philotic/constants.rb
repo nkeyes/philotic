@@ -1,15 +1,5 @@
 module Philotic
 
-  CONNECTION_OPTIONS = [
-      :rabbit_host,
-      :connection_failed_handler,
-      :connection_loss_handler,
-      :timeout,
-  ]
-  EXCHANGE_OPTIONS   = [
-      :exchange_name,
-      :message_return_handler,
-  ]
   MESSAGE_OPTIONS    = [
       :routing_key,
       :persistent,

@@ -1,12 +1,6 @@
 require 'pathname'
 
 module Philotic
-  class << self
-    def root
-      ::Pathname.new File.expand_path('../../', __FILE__)
-    end
-  end
-
 end
 
 require 'philotic/constants'
