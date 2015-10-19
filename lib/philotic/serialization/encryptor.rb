@@ -16,11 +16,11 @@ module Philotic
       end
 
       def default_encryption_key
-        AvantEncryption.key
+        Philotic.config.encryption_key
       end
 
       def random_salt
-        Digest::SHA256.hexdigest((Time.now.to_i * rand(1000)).to_s)
+        Base64.encode64 SecureRandom.random_bytes(256)
       end
 
       def default_algorithm
@@ -32,7 +32,7 @@ module Philotic
       end
 
       def key
-        '1234567890987654321'
+        @key ||= default_encryption_key
       end
 
       def dump(payload, metadata)

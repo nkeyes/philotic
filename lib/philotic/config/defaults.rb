@@ -35,6 +35,7 @@ module Philotic
       CONNECTION_ATTEMPTS     = 3
       PREFETCH_COUNT          = 0
       RAISE_ERROR_ON_PUBLISH  = false
+      ENCRYPTION_KEY          = nil
 
       def defaults
         @defaults ||= Hash[Philotic::Config::Defaults.constants.map do |c|
