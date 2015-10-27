@@ -11,7 +11,7 @@ module Philotic
 
       def factory(serialization)
         serialization = serialization.to_s.downcase.to_sym
-        @serializers[serialization]
+        serializers[serialization]
       end
 
       def register(serializer)

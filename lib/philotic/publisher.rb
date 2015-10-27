@@ -1,5 +1,5 @@
 require 'philotic/constants'
-require 'philotic/serialization/serializer'
+require 'philotic/serialization'
 
 module Philotic
   class Publisher
