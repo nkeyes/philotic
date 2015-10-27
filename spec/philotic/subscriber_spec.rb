@@ -133,7 +133,7 @@ describe Philotic::Subscriber do
 
     specify do
       expect(subject.connection).to receive(:channel).and_return(channel)
-      expect(message).to receive(:delivery_info).and_return(delivery_info)
+      expect(message).to receive(:delivery_info).twice.and_return(delivery_info)
       expect(delivery_info).to receive(:delivery_tag).and_return(delivery_tag)
       expect(channel).to receive(:acknowledge).with(delivery_tag, false)
       subject.acknowledge(message)
@@ -149,7 +149,7 @@ describe Philotic::Subscriber do
 
     specify do
       expect(subject.connection).to receive(:channel).and_return(channel)
-      expect(message).to receive(:delivery_info).and_return(delivery_info)
+      expect(message).to receive(:delivery_info).twice.and_return(delivery_info)
       expect(delivery_info).to receive(:delivery_tag).and_return(delivery_tag)
       expect(channel).to receive(:reject).with(delivery_tag, true)
       subject.reject(message)

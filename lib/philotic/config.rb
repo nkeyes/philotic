@@ -7,7 +7,7 @@ require 'cgi'
 require 'bunny/session'
 require 'logger'
 require 'philotic/config/defaults'
-require 'active_support/inflections'
+require 'active_support/all'
 
 module Philotic
   class Config

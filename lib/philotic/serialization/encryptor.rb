@@ -1,6 +1,7 @@
 require 'encryptor'
-require 'philotic/serialization/serializer'
 require 'base64'
+require 'i18n/core_ext/hash'
+require 'philotic/serialization/serializer'
 
 module Philotic
   module Serialization
@@ -44,7 +45,7 @@ module Philotic
       end
 
       def load(payload, metadata)
-        headers = metadata[:headers].deep_dup.deep_symbolize_keys
+        headers = Marshal.load(Marshal.dump(metadata[:headers])).deep_symbolize_keys
 
         iv = Base64.decode64 headers[:encryption][:iv]
         salt = Base64.decode64 headers[:encryption][:salt]

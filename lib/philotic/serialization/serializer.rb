@@ -1,3 +1,5 @@
+require 'i18n/core_ext/hash'
+
 module Philotic
   module Serialization
     module Serializer
@@ -27,7 +29,7 @@ module Philotic
 
       private
       def _transform(dump_or_load, payload, metadata)
-        headers = metadata[:headers].deep_dup.deep_symbolize_keys
+        headers = Marshal.load(Marshal.dump(metadata[:headers])).deep_symbolize_keys
 
         serializations = headers[:philotic_serializations]
 

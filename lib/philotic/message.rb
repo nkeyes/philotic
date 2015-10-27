@@ -1,6 +1,6 @@
 require 'philotic/constants'
 require 'philotic/singleton'
-require 'active_support/inflections'
+require 'active_support/all'
 
 module Philotic
   class Message
@@ -80,7 +80,7 @@ module Philotic
     end
 
     def delivery_tag
-      delivery_info.try(:delivery_tag)
+      delivery_info && delivery_info.delivery_tag
     end
 
     def payload
