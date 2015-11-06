@@ -121,6 +121,7 @@ module Philotic
 
     def _set_routables_or_payloads(type, attrs)
       attrs.each do |key, value|
+        key = _normalize_attr_name(key)
         if self.respond_to?(:"#{key}=")
           send(:"#{key}=", value)
         elsif _is_anonymous_message?
@@ -135,21 +136,34 @@ module Philotic
     end
 
     def _set_message_attribute_accessor(attr, value)
+      attr = _normalize_attr_name(attr)
       _set_message_attribute_getter(attr)
       _set_message_attribute_setter(attr)
       self.send(:"#{attr}=", value)
     end
 
     def _set_message_attribute_getter(attr)
+      attr = _normalize_attr_name(attr)
       self.define_singleton_method :"#{attr}" do
         instance_variable_get(:"@#{attr}")
       end
     end
 
     def _set_message_attribute_setter(attr)
+      attr = _normalize_attr_name(attr)
       self.define_singleton_method :"#{attr}=" do |v|
         instance_variable_set(:"@#{attr}", v)
       end
+    end
+
+    def _normalize_attr_name(attr)
+      %i[_underscore_attr_name].reduce(attr) do |attr, normalizer|
+        send(normalizer, attr)
+      end.to_sym
+    end
+    def _underscore_attr_name(attr)
+      attr.to_s.tr('-', '_')
+
     end
   end
 end

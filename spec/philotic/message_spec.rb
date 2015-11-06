@@ -237,4 +237,14 @@ describe Philotic::Message do
     end
 
   end
+
+
+  describe 'hyphenated attrs' do
+    let(:hyphenated_attr) { 'x-hyphenated-attr' }
+    let(:hyphenated_attr_value) { 'foo' }
+    let(:message) { Class.new(Philotic::Message).new(hyphenated_attr => hyphenated_attr_value) }
+    specify 'translate hyphens to underscores' do
+      expect(message.x_hyphenated_attr).to eq hyphenated_attr_value
+    end
+  end
 end
