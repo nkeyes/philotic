@@ -16,6 +16,7 @@ module Philotic
       RABBIT_VHOST              = '%2f' # '/'
       RABBIT_URL                = "#{RABBIT_SCHEME}://#{RABBIT_USER}:#{RABBIT_PASSWORD}@#{RABBIT_HOST}:#{RABBIT_PORT}/#{RABBIT_VHOST}"
       EXCHANGE_NAME             = 'philotic.headers'
+      EXCHANGE_TYPE             = 'headers'
       ROUTING_KEY               = nil
       PERSISTENT                = false
       IMMEDIATE                 = false
