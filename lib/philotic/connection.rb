@@ -104,7 +104,7 @@ module Philotic
     end
 
     def exchange
-      @exchange ||= channel.headers(config.exchange_name, durable: true)
+      @exchange ||= channel.send(config.exchange_type, config.exchange_name, durable: true)
     end
 
     def set_exchange_return_handler!
@@ -148,7 +148,7 @@ module Philotic
     end
 
     def exchange_from_config(config)
-      config[:exchange] ? channel.headers(config[:exchange], durable: true) : exchange
+      config[:exchange] ? channel.send(self.config.exchange_type, config[:exchange], durable: true) : exchange
     end
 
     def queue_from_config(queue_name, config)
