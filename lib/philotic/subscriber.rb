@@ -23,7 +23,7 @@ module Philotic
       lambda do |delivery_info, metadata, payload|
         hash_payload = Philotic::Serialization::Serializer.load(payload, metadata)
 
-        message = Class.new(Philotic::Message).new(metadata[:headers], hash_payload)
+        message               = Class.new(Philotic::Message).new(metadata[:headers], hash_payload)
         message.delivery_info = delivery_info
 
         instance_exec(message, &block)
@@ -69,10 +69,10 @@ module Philotic
       queue_options[:auto_delete] ||= true if queue_name == ''
 
       {
-          queue_name:        queue_name,
-          queue_options:     queue_options,
-          arguments:         arguments,
-          subscribe_options: subscribe_options,
+        queue_name:        queue_name,
+        queue_options:     queue_options,
+        arguments:         arguments,
+        subscribe_options: subscribe_options,
       }
     end
 
@@ -91,9 +91,7 @@ module Philotic
     end
 
     def endure
-      while true
-        Thread.pass
-      end
+      Thread.stop
     end
   end
 end
