@@ -67,22 +67,6 @@ describe Philotic::Consumer do
     end
   end
 
-  describe '.rejectable_errors' do
-    it 'maintains a set of rejectable errors' do
-      expect(subject.rejectable_errors).to be_empty
-      expect(subject.rejectable_errors(RuntimeError).size).to be 1
-      expect(subject.rejectable_errors).to include(RuntimeError)
-
-      expect(subject.rejectable_errors(RuntimeError, NotImplementedError).size).to be 2
-      expect(subject.rejectable_errors).to include(NotImplementedError)
-
-
-      # don't allow dupes
-      expect(subject.rejectable_errors(RuntimeError, NotImplementedError).size).to be 2
-
-    end
-  end
-
   describe '.subscribe' do
     let (:connection) { instance_double Philotic::Connection }
     let (:consumer_instance) { instance_double subject }
@@ -143,26 +127,36 @@ describe Philotic::Consumer do
     subject { (Class.new(Philotic::Consumer)).new(nil) }
     let(:message) { instance_double Philotic::Message }
 
-    it 'proxies to #consume' do
+    it 'proxies to #consume  when @auto_acknowledge is falsey' do
       expect(subject).to receive(:consume).with(message)
 
       subject.send(:_consume, message)
     end
 
-    it 'acknowledges messages when @ack_messages is set' do
-      subject.class.auto_acknowledge
+    it 'proxies to #_auto_ack_consume when @auto_acknowledge is truthy' do
+      expect(subject).to receive(:_auto_ack_consume).with(message)
 
+      subject.class.auto_acknowledge
+      subject.send(:_consume, message)
+    end
+
+  end
+
+  describe '#_auto_ack_consume' do
+    subject { (Class.new(Philotic::Consumer)).new(nil) }
+    let(:message) { instance_double Philotic::Message }
+
+    it 'acknowledges messages when @ack_messages is set' do
       subject.define_singleton_method :consume do |message|
         # no op
       end
 
       expect(subject).to receive(:acknowledge).with(message)
 
-      subject.send(:_consume, message)
-    end
+      subject.send(:_auto_ack_consume, message)
+      end
 
     it 'requeues messages when @ack_messages is set and a requeueable error is thrown' do
-      subject.class.auto_acknowledge
       subject.class.requeueable_errors(RuntimeError)
 
       subject.define_singleton_method :consume do |message|
@@ -171,30 +165,17 @@ describe Philotic::Consumer do
 
       expect(subject).to receive(:reject).with(message, true)
 
-      subject.send(:_consume, message)
+      subject.send(:_auto_ack_consume, message)
     end
 
-    it 'rejects messages when @ack_messages is set and a rejectable error is thrown' do
-      subject.class.auto_acknowledge
-      subject.class.rejectable_errors(RuntimeError)
-
+    it 'rejects messages when @ack_messages is set and a non-requeueable error is thrown' do
       subject.define_singleton_method :consume do |message|
         raise RuntimeError.new 'oops'
       end
 
       expect(subject).to receive(:reject).with(message, false)
 
-      subject.send(:_consume, message)
-    end
-
-    it 'raises all non-requeueable and non-rejectable errors' do
-      subject.class.auto_acknowledge
-
-      subject.define_singleton_method :consume do |message|
-        raise RuntimeError.new 'oops'
-      end
-
-      expect {subject.send(:_consume, message)}.to raise_error RuntimeError
+      subject.send(:_auto_ack_consume, message)
     end
   end
 end

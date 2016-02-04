@@ -43,12 +43,6 @@ module Philotic
         @requeueable_errors
       end
 
-      def rejectable_errors(*errors)
-        @rejectable_errors ||= Set.new
-        @rejectable_errors.merge errors
-        @rejectable_errors
-      end
-
       def subscribe
         new(Philotic.connection).tap do |instance|
           instance.subscribe
@@ -73,24 +67,79 @@ module Philotic
       raise NotImplementedError
     end
 
+    def before_acknowledge(message)
+      # no op
+    end
+
+    def after_acknowledge(message)
+      # no op
+    end
+
+    def before_requeue(message)
+      # no op
+    end
+
+    def after_requeue(message)
+      # no op
+    end
+
+    def before_reject(message)
+      # no op
+    end
+
+    def after_reject(message)
+      # no op
+    end
+
+    def acknowledge_message(message)
+      _safe_hook(:before_acknowledge, message)
+      acknowledge(message)
+      _safe_hook(:after_acknowledge, message)
+    end
+
+    def requeue_message(message)
+      _safe_hook(:before_requeue, message)
+      reject(message, true)
+      _safe_hook(:after_requeue, message)
+
+    end
+
+    def reject_message(message)
+      _safe_hook(:before_reject, message)
+      reject(message, false)
+      _safe_hook(:before_reject, message)
+
+    end
+
     private
+
+    def _safe_hook(hook, message)
+      begin
+        send(hook, message)
+      rescue => e
+        logger.error {}
+      end
+
+    end
 
     def _consume(message)
       if self.class.auto_acknowledge?
-        begin
-          consume(message)
-          acknowledge(message)
-        rescue => e
-          if self.class.requeueable_errors.include? e.class
-            reject(message, true)
-          elsif self.class.rejectable_errors.include? e.class
-            reject(message, false)
-          else
-            raise e
-          end
-        end
+        _auto_ack_consume(message)
       else
         consume(message)
+      end
+    end
+
+    def _auto_ack_consume(message)
+      begin
+        consume(message)
+        acknowledge_message(message)
+      rescue => e
+        if self.class.requeueable_errors.include? e.class
+          requeue_message(message)
+        else
+          reject_message(message)
+        end
       end
     end
   end
